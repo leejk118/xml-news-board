@@ -59,9 +59,13 @@ class MakeNews extends Command
 
                 $imgPath = $this->getImgPath($sendDate);
                 $taggedBody = $this->replaceXmlBody($taggedBody, $imgPath);
+                $prevImg = $xml->NewsContent->AppendData->FileName;
+
+                if (isset($prevImg)) $preview_img = $imgPath . $prevImg;
+                else $preview_img = null;
 
                 $this->saveNewsImg($xml->NewsContent->AppendData, $imgPath, $sendDate);
-                $this->insertDB($xml, $taggedBody, $sendDate);
+                $this->insertDB($xml, $taggedBody, $sendDate, $preview_img);
 
                 break;
             }
@@ -124,13 +128,14 @@ class MakeNews extends Command
         }
     }
 
-    public function insertDB($xml, $taggedBody, $sendDate){
+    public function insertDB($xml, $taggedBody, $sendDate, $preview_img){
         \App\Article::create([
             'title' => $xml->NewsContent->Title,
             'subtitle' => $xml->NewsContent->SubTitle,
             'content' => $taggedBody,
             'send_date' => $sendDate,
-            'news_link' =>$xml->Metadata->Href
+            'news_link' => $xml->Metadata->Href,
+            'preview_img' => $preview_img
         ]);
     }
 }
