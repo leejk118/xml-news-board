@@ -87,8 +87,8 @@ class MakeNews extends Command
             preg_match("/title='(.*?)'/", $matches[1], $title);
             preg_match("/caption='(.*?)'/", $matches[1], $caption);
 
-            $result = "<img src='/" . $imgPath . $path[1] . " />";
-            if (isset($title[1])) $result .= "<strong>" . $title[1] . "</strong>";
+            $result = "<img src='/" . $imgPath . $path[1] . "' />";
+            if (isset($title[1])) $result .= "<br><strong>" . $title[1] . "</strong>";
             if (isset($caption[1])) $result .= "<p>" .$caption[1] . "</p>";
 
             return $result;

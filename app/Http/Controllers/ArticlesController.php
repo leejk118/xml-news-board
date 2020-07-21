@@ -13,7 +13,9 @@ class ArticlesController extends Controller
      */
     public function index()
     {
-        //
+        $articles = \App\Article::latest()->paginate(10);
+
+        return view('articles.index', compact('articles'));
     }
 
     /**
@@ -45,7 +47,9 @@ class ArticlesController extends Controller
      */
     public function show($id)
     {
-        //
+        $article = \App\Article::find($id);
+
+        return view('articles.show', compact('article'));
     }
 
     /**
