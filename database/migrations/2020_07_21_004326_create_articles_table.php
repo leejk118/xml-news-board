@@ -19,7 +19,7 @@ class CreateArticlesTable extends Migration
             $table->string('subtitle')->nullable();
             $table->string('content', 10000);
             $table->date('send_date');
-            $table->string('new_link');
+            $table->string('news_link');
             $table->timestamps();
         });
     }
