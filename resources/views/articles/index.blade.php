@@ -3,6 +3,15 @@
 @section('css')
     <style type="text/css">
         a { color:black; text-decoration:none; }
+
+        .searchForm {
+            display: inline-block;
+            width:500px;
+        }
+
+        .divCenter {
+            text-align: center;
+        }
     </style>
 @stop
 
@@ -41,10 +50,22 @@
             @endforeach
         </table>
 
-        @if($articles->count())
-            <div class="text-center">
+        <div>
+            @if($articles->count())
                 {!! $articles->render() !!}
-            </div>
-        @endif
+            @endif
+        </div>
+
+        <div class="divCenter">
+            <form action="{{ route('articles.index') }}" metod="get">
+                <select class="form-control " style="width: 200px; display: inline-block" name="category">
+                    <option value="both">제목 + 본문</option>
+                    <option value="title">제목</option>
+                    <option value="content">본문</option>
+                </select>
+                <input type="text" name="q" class="form-control searchForm" placeholder="기사 검색" />
+                <button type="submit" class="btn btn-primary">검색</button>
+            </form>
+        </div>
     </div>
 @stop

@@ -4,16 +4,34 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class ArticlesController extends Controller
+class ArticleController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $articles = \App\Article::latest()->paginate(10);
+        if ($request->input('q') != null){
+            $keyword = $request->q;
+            $category = $request->category;
+
+            if ($category == 'both') {
+                $articles = \App\Article::where('title', 'like', '%' . $keyword  . '%')
+                                            ->orWhere('content', 'like', '%' . $keyword  . '%')
+                                            ->paginate(10);
+            }
+            else {
+                $articles = \App\Article::where($category, 'like', '%' . $keyword  . '%')
+                                            ->paginate(10);
+            }
+
+            $articles->withQueryString()->links();
+        }
+        else {
+            $articles = \App\Article::latest()->paginate(10);
+        }
 
         return view('articles.index', compact('articles'));
     }
