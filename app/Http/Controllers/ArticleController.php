@@ -69,6 +69,9 @@ class ArticleController extends Controller
     {
         $article = \App\Article::find($id);
 
+        $article->view_count += 1;
+        $article->save();
+
         return view('articles.show', compact('article'));
     }
 

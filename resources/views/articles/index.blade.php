@@ -17,7 +17,9 @@
 
 @section('content')
     <div class="container">
-        <h1>News</h1>
+        <a href="{{ route('articles.index') }}">
+            <h1>News</h1>
+        </a>
         <hr>
         <button id="deleteAll" onclick="button_click()">일괄삭제</button>
         <table class="table">
@@ -25,7 +27,7 @@
                 <th>id</th>
                 <th>기사 제목</th>
                 <th>등록일</th>
-                <th>조회수 (예정)</th>
+                <th>조회수</th>
                 <th>admin</th>
             </tr>
             @foreach($articles as $article)
@@ -48,7 +50,7 @@
                         {{ $article->send_date }}
                     </td>
                     <td>
-                        조회수
+                        {{ $article->view_count }}
                     </td>
                     <td>
                         <form action="{{ route('articles.destroy', [$article->id]) }}" method="post"
