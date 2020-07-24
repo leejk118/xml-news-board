@@ -30,8 +30,10 @@ class ArticleController extends Controller
             $articles->withQueryString()->links();
         }
         else {
-            $articles = \App\Article::latest()->paginate(10);
+            $articles = \App\Article::orderBy('id', 'desc')->paginate(10);
         }
+
+//        $articles->orderBy('id', 'desc');
 
         return view('articles.index', compact('articles'));
     }
@@ -90,7 +92,7 @@ class ArticleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+
     }
 
     /**
@@ -101,6 +103,18 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
-        //
+        \App\Article::destroy($id);
+
+        return redirect(route('articles.index'));
+    }
+
+    public function destroys(Request $request){
+        $list = json_decode($request->getContent(), true);
+
+        foreach ($list['data'] as $id) {
+            \App\Article::destroy($id);
+        }
+
+        return redirect(route('articles.index'));
     }
 }

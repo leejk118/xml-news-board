@@ -20,6 +20,11 @@ Route::get('/', function () {
 
 Route::resource('articles', 'ArticleController');
 
+Route::post('articles/destroy', [
+    'as' => 'articles.destroys',
+    'uses' => 'ArticleController@destroys'
+]);
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');

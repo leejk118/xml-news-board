@@ -19,14 +19,18 @@
     <div class="container">
         <h1>News</h1>
         <hr>
+        <button id="deleteAll" onclick="button_click()">일괄삭제</button>
         <table class="table">
             <tr>
+                <th>id</th>
                 <th>기사 제목</th>
                 <th>등록일</th>
                 <th>조회수 (예정)</th>
+                <th>admin</th>
             </tr>
             @foreach($articles as $article)
                 <tr height="100px">
+                    <td>{{ $article->id }}</td>
                     <td width="800px">
                         <a href="articles/{{ $article->id }}">
                             @if (isset($article->preview_img))
@@ -46,6 +50,15 @@
                     <td>
                         조회수
                     </td>
+                    <td>
+                        <form action="{{ route('articles.destroy', [$article->id]) }}" method="post"
+                                    onsubmit="return confirm('삭제하시겠습니까?');">
+                            {!! csrf_field() !!}
+                            <input type="hidden" name="_method" value="delete">
+                            <button>삭제</button>
+                        </form>
+                        <input type="checkbox" value="{{ $article->id }}">
+                    </td>
                 </tr>
             @endforeach
         </table>
@@ -56,8 +69,9 @@
             @endif
         </div>
 
+
         <div class="divCenter">
-            <form action="{{ route('articles.index') }}" metod="get">
+            <form action="{{ route('articles.index') }}" method="get">
                 <select class="form-control " style="width: 200px; display: inline-block" name="category">
                     <option value="both">제목 + 본문</option>
                     <option value="title">제목</option>
@@ -68,4 +82,36 @@
             </form>
         </div>
     </div>
+@stop
+
+@section('script')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>
+        function button_click(){
+            var target = $("input[type='checkbox']").filter(':checked');
+
+            var targetList = [];
+            for (var i = 0; i < target.length; ++i){
+                targetList.push(target[i].value);
+            }
+
+            if (confirm("전부 삭제?")){
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url : '{{ route('articles.destroys') }}',
+                    type : 'POST',
+                    data : JSON.stringify({data : targetList}),
+                    success : function () {
+                        alert("삭제 성공");
+                        window.location.href = '{{ route('articles.index') }}';
+                    }
+                });
+            }
+
+
+        }
+    </script>
 @stop
