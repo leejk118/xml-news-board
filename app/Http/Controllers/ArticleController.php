@@ -83,7 +83,9 @@ class ArticleController extends Controller
      */
     public function edit($id)
     {
-        //
+        $article = \App\Article::find($id);
+
+        return view('articles.edit', compact('article'));
     }
 
     /**
@@ -95,7 +97,15 @@ class ArticleController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $content = $request->ir1;
+        $previewContent = iconv_substr(preg_replace("/<(.+?)>/", "", $content), 0, 100, "UTF-8");
 
+        \App\Article::where('id', $id)
+                    ->update(['title' => $request->title,
+                            'content' => $content,
+                            'preview_content' => $previewContent]);
+
+        return redirect(route('articles.index'));
     }
 
     /**

@@ -59,6 +59,9 @@
                             <input type="hidden" name="_method" value="delete">
                             <button>삭제</button>
                         </form>
+                        <form action="{{ route('articles.edit', [$article->id]) }}" method="GET">
+                            <button>수정</button>
+                        </form>
                         <input type="checkbox" value="{{ $article->id }}">
                     </td>
                 </tr>
