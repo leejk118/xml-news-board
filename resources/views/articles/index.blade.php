@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('css')
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <style type="text/css">
         a { color:black; text-decoration:none; }
 
@@ -12,6 +14,12 @@
         .divCenter {
             text-align: center;
         }
+
+        .iconBtn {
+            font-family: FontAwesome;
+            background: none;
+            border: none;
+        }
     </style>
 @stop
 
@@ -21,19 +29,22 @@
             <h1>News</h1>
         </a>
         <hr>
-        <button id="deleteAll" onclick="button_click()">일괄삭제</button>
-        <table class="table">
+
+        <div style="text-align: right">
+            <button id="deleteAll" onclick="button_click()">일괄삭제</button>
+        </div>
+        <br>
+
+        <table class="table"  style="text-align: center">
             <tr>
-                <th>id</th>
-                <th>기사 제목</th>
+                <th>기사</th>
                 <th>등록일</th>
                 <th>조회수</th>
                 <th>admin</th>
             </tr>
             @foreach($articles as $article)
-                <tr height="100px">
-                    <td>{{ $article->id }}</td>
-                    <td width="800px">
+                <tr height="80px">
+                    <td width="700px" style="text-align: left;">
                         <a href="articles/{{ $article->id }}">
                             @if (isset($article->preview_img))
                                 <div style="float: left; margin-right: 30px">
@@ -41,7 +52,7 @@
                                 </div>
                             @endif
                             <div>
-                                <h5>{{ $article->title }}</h5>
+                                <h5><b>{{ $article->title }}</b></h5>
                                 <p>{{ $article->preview_content }}...</p>
                             </div>
                         </a>
@@ -53,15 +64,18 @@
                         {{ $article->view_count }}
                     </td>
                     <td>
-                        <form action="{{ route('articles.destroy', [$article->id]) }}" method="post"
-                                    onsubmit="return confirm('삭제하시겠습니까?');">
+                        <form action="{{ route('articles.destroy', $article->id) }}" method="post"
+                                    onsubmit="return confirm('삭제하시겠습니까?');" style="display: inline;">
                             {!! csrf_field() !!}
                             <input type="hidden" name="_method" value="delete">
-                            <button>삭제</button>
+                            <input class="iconBtn" style="color:red;" type="submit" value="&#xf1f8">
                         </form>
-                        <form action="{{ route('articles.edit', [$article->id]) }}" method="GET">
-                            <button>수정</button>
+
+                        <form action="{{ route('articles.edit', $article->id) }}" method="GET"
+                                style="display: inline;">
+                            <input class="iconBtn" style="color:green;" type="submit" value="&#xf044">
                         </form>
+
                         <input type="checkbox" value="{{ $article->id }}">
                     </td>
                 </tr>
@@ -96,12 +110,18 @@
         function button_click(){
             var target = $("input[type='checkbox']").filter(':checked');
 
+            if (target.length == 0) {
+                alert("선택된 항목이 없습니다.");
+                return ;
+            }
+
             var targetList = [];
-            for (var i = 0; i < target.length; ++i){
+            var length = target.length;
+            for (var i = 0; i < length; ++i){
                 targetList.push(target[i].value);
             }
 
-            if (confirm("전부 삭제?")){
+            if (confirm(length + "개의 데이터를 삭제 하시겠습니까?")){
                 $.ajax({
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -115,8 +135,6 @@
                     }
                 });
             }
-
-
         }
     </script>
 @stop

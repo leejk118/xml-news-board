@@ -30,10 +30,8 @@ class ArticleController extends Controller
             $articles->withQueryString()->links();
         }
         else {
-            $articles = \App\Article::orderBy('id', 'desc')->paginate(10);
+            $articles = \App\Article::orderBy('send_date', 'desc')->paginate(10);
         }
-
-//        $articles->orderBy('id', 'desc');
 
         return view('articles.index', compact('articles'));
     }
