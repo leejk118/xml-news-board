@@ -30,9 +30,11 @@
         </a>
         <hr>
 
-        <div style="text-align: right">
-            <button id="deleteAll" onclick="button_click()">일괄삭제</button>
-        </div>
+        @auth
+            <div style="text-align: right">
+                <button id="deleteAll" onclick="button_click()" class="btn btn-danger">일괄삭제</button>
+            </div>
+        @endauth
         <br>
 
         <table class="table"  style="text-align: center">
@@ -40,7 +42,9 @@
                 <th>기사</th>
                 <th>등록일</th>
                 <th>조회수</th>
-                <th>admin</th>
+                @auth
+                    <th>admin</th>
+                @endauth
             </tr>
             @foreach($articles as $article)
                 <tr height="80px">
@@ -63,21 +67,23 @@
                     <td>
                         {{ $article->view_count }}
                     </td>
-                    <td>
-                        <form action="{{ route('articles.destroy', $article->id) }}" method="post"
-                                    onsubmit="return confirm('삭제하시겠습니까?');" style="display: inline;">
-                            {!! csrf_field() !!}
-                            <input type="hidden" name="_method" value="delete">
-                            <input class="iconBtn" style="color:red;" type="submit" value="&#xf1f8">
-                        </form>
+                    @auth
+                        <td>
+                            <form action="{{ route('articles.destroy', $article->id) }}" method="post"
+                                        onsubmit="return confirm('삭제하시겠습니까?');" style="display: inline;">
+                                {!! csrf_field() !!}
+                                <input type="hidden" name="_method" value="delete">
+                                <input class="iconBtn" style="color:red;" type="submit" value="&#xf1f8">
+                            </form>
 
-                        <form action="{{ route('articles.edit', $article->id) }}" method="GET"
-                                style="display: inline;">
-                            <input class="iconBtn" style="color:green;" type="submit" value="&#xf044">
-                        </form>
+                            <form action="{{ route('articles.edit', $article->id) }}" method="GET"
+                                    style="display: inline;">
+                                <input class="iconBtn" style="color:green;" type="submit" value="&#xf044">
+                            </form>
 
-                        <input type="checkbox" value="{{ $article->id }}">
-                    </td>
+                            <input type="checkbox" value="{{ $article->id }}">
+                        </td>
+                    @endauth
                 </tr>
             @endforeach
         </table>

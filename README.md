@@ -501,3 +501,12 @@
               return redirect(route('articles.index'));
           }
         ```      
+
+## 로그인에 따른 수정/삭제 기능 추가
+* 라라벨 auth 기능 사용
+    - `composer require laravel/ui --dev`
+    - `php artisan ui bootstrap --auth`
+- Index 페이지에서 로그인 시 일괄삭제/개별삭제/수정 기능 구현
+    - admin 부분 @auth @endauth로 처리
+
+        

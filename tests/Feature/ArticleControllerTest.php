@@ -15,17 +15,16 @@ class ArticleControllerTest extends TestCase
      */
     public function testExample()
     {
-        $response = $this->get('/articles');
+        $response = $this->getJson('/articles', ['q' => '전자', 'category' => 'both']);
 
-        $response->assertStatus(200);
-    }
+//        $response = $this->getJson('/articles');
 
-    public function indexTest(){
-        $response = $this->get('/articles?q=냉장고');
-//
-        $response->assertStatus(200);
-        $response->assertSee('asdf');
+        $response
+            ->assertStatus(200)
+            ->assertJson(['title' => "ss"]);
 
+        $content = $this->call('GET', '/articles')->getContent();
 
     }
+
 }
