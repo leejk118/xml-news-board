@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use http\QueryString;
 use Illuminate\Http\Request;
 
 class ArticleController extends Controller
@@ -13,25 +14,19 @@ class ArticleController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->input('q') != null){
-            $keyword = $request->q;
-            $category = $request->category;
-
-            if ($category == 'both') {
-                $articles = \App\Article::where('title', 'like', '%' . $keyword  . '%')
-                                            ->orWhere('content', 'like', '%' . $keyword  . '%')
-                                            ->paginate(10);
+        $articles = \App\Article::where(function($query) use ($request) {
+            if ($request->q != null){
+                if ($request->category == 'both'){
+                    $query->orWhere('title', 'like', '%' . $request->q  . '%');
+                    $query->orWhere('content', 'like', '%' . $request->q  . '%');
+                }
+                else {
+                    $query->orWhere($request->category, 'like', '%' . $request->q  . '%');
+                }
             }
-            else {
-                $articles = \App\Article::where($category, 'like', '%' . $keyword  . '%')
-                                            ->paginate(10);
-            }
+        })->orderBy('id', 'desc')->paginate(20);
 
-            $articles->withQueryString()->links();
-        }
-        else {
-            $articles = \App\Article::orderBy('send_date', 'desc')->paginate(10);
-        }
+        $articles->appends(request()->query())->links();
 
         return view('articles.index', compact('articles'));
     }
@@ -103,7 +98,7 @@ class ArticleController extends Controller
                             'content' => $content,
                             'preview_content' => $previewContent]);
 
-        return redirect(route('articles.index'));
+        return view('articles.show', ['article' => \App\Article::find($id)]);
     }
 
     /**
@@ -116,7 +111,7 @@ class ArticleController extends Controller
     {
         \App\Article::destroy($id);
 
-        return redirect(route('articles.index'));
+        return back();
     }
 
     public function destroys(Request $request){
@@ -125,7 +120,5 @@ class ArticleController extends Controller
         foreach ($list['data'] as $id) {
             \App\Article::destroy($id);
         }
-
-        return redirect(route('articles.index'));
     }
 }

@@ -88,7 +88,7 @@
             @endforeach
         </table>
 
-        <div>
+        <div style="width: 525px; margin: auto">
             @if($articles->count())
                 {!! $articles->render() !!}
             @endif
@@ -137,7 +137,7 @@
                     data : JSON.stringify({data : targetList}),
                     success : function () {
                         alert("삭제 성공");
-                        window.location.href = '{{ route('articles.index') }}';
+                        window.location.reload();
                     }
                 });
             }

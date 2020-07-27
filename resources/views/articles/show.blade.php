@@ -11,16 +11,21 @@
         {!!  $article->content  !!}
 
         <br>
-        <form action="{{ route('articles.destroy', $article->id) }}" method="post"
-              onsubmit="return confirm('삭제하시겠습니까?');" style="display: inline;">
-            {!! csrf_field() !!}
-            <input type="hidden" name="_method" value="delete">
-            <input type="submit" value="삭제하기"/>
-        </form>
+        <br>
 
-        <form action="{{ route('articles.edit', $article->id) }}" method="GET"
-              style="display: inline;">
-            <input type="submit" value="수정하기"/>
-        </form>
+        <div>
+
+            <form action="{{ route('articles.destroy', $article->id) }}" method="post"
+                  onsubmit="return confirm('삭제하시겠습니까?');" style="display: inline;">
+                {!! csrf_field() !!}
+                <input type="hidden" name="_method" value="delete">
+                <input type="submit" value="삭제하기"/>
+            </form>
+
+            <form action="{{ route('articles.edit', $article->id) }}" method="GET"
+                  style="display: inline;">
+                <input type="submit" value="수정하기"/>
+            </form>
+        </div>
     </div>
 @stop

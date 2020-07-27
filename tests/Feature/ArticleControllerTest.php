@@ -20,10 +20,10 @@ class ArticleControllerTest extends TestCase
 //        $response = $this->getJson('/articles');
 
         $response
-            ->assertStatus(200)
-            ->assertJson(['title' => "ss"]);
+            ->assertStatus(200);
+//            ->assertJson(['title' => "ss"]);
 
-        $content = $this->call('GET', '/articles')->getContent();
+//        $content = $this->call('GET', '/articles')->getContent();
 
     }
 

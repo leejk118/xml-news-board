@@ -509,4 +509,83 @@
 - Index 페이지에서 로그인 시 일괄삭제/개별삭제/수정 기능 구현
     - admin 부분 @auth @endauth로 처리
 
-        
+
+## 수정/삭제/조회 리팩토링 - 예외사항 
+- n번째 페이지에서 삭제 시 n번째 페이지로 이동
+    - 개별 삭제 : back() 메서드 사용
+        ```php 
+          public function destroy($id)
+          {
+              \App\Article::destroy($id);
+      
+              return back();
+          }
+        ```
+    - 일괄 삭제 : 리로드 방식으로 처리
+        ```php 
+        success : function () {
+            alert("삭제 성공");
+            window.location.reload();
+        }
+        ```
+      
+- 컨텐츠 수정 시 수정된 컨텐츠 show 페이지로 이동
+    - 라우트 처리
+        ```php 
+        return view('articles.show', ['article' => \App\Article::find($id)]);
+        ```
+      
+~~- 검색 후 수정/삭제 기능 구현(마찬가지로 삭제 시 해당 페이지, 수정 시 해당 detail 페이지)~~
+- 로그인/로그아웃 시 현재 페이지 유지(수정/삭제 아닌 경우)          
+- 뉴스 detail 페이지에서 수정/삭제/목록으로 기능 구현 - 비로그인 시에는 목록으로 만 보이게
+- 마지막 페이지에 1개 남은 컨텐츠 삭제 시 페이지 이동 / 마지막 페이지 일괄 삭제 시 ?
+- 뉴스 detail 페이지에서 삭제 시  이슈
+
+- 페이징 넘어갈 경우 처리 (총 40페이지인경우 page=41을 줄 경우)
+
+- ArticlesController@index 리팩토링
+    - before
+        ```php 
+        if ($request->input('q') != null){
+            $keyword = $request->q;
+            $category = $request->category;
+
+            if ($category == 'both') {
+                $articles = \App\Article::orWhere('title', 'like', '%' . $keyword  . '%')
+                                            ->orWhere('content', 'like', '%' . $keyword  . '%')
+                                            ->paginate(10);
+            }
+            else {
+                $articles = \App\Article::orWhere($category, 'like', '%' . $keyword  . '%')
+                                            ->paginate(10);
+            }
+
+            $articles->withQueryString()->links();
+        }
+        else {
+            $articles = \App\Article::orderBy('id', 'desc')->paginate(10);
+        }
+        ```
+    - after
+        ```php 
+        $articles = \App\Article::where(function($query) use ($request) {
+            if ($request->q != null){
+                if ($request->category == 'both'){
+                    $query->orWhere('title', 'like', '%' . $request->q  . '%');
+                    $query->orWhere('content', 'like', '%' . $request->q  . '%');
+                }
+                else {
+                    $query->orWhere($request->category, 'like', '%' . $request->q  . '%');
+                }
+            }
+        })->orderBy('id', 'desc')->paginate(10);
+
+        $articles->appends(request()->query())->links();
+        ```       
+    - 참조 
+        - https://laravel.io/forum/12-24-2014-eloquent-dynamic-orwhere-query
+        - https://github.com/laravel/framework/issues/19441
+
+
+
+## 테스트
