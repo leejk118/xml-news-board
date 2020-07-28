@@ -42,13 +42,17 @@ class MakeNews extends Command
         $dirs = scandir($newsDir);
 
         foreach ($dirs as $dateDir) {
-            if (is_dir($dateDir)) continue;
+            if (is_dir($dateDir)) {
+                continue;
+            }
 
             $articles = scandir($newsDir . "/" . $dateDir);
 
             foreach ($articles as $article) {
                 $ext = pathinfo($article);
-                if($ext['extension'] != 'xml') continue;
+                if ($ext['extension'] != 'xml') {
+                    continue;
+                }
 
                 $xmlfile = $newsDir . "/" . $dateDir . "/" . $article;
                 $xml = simplexml_load_file($xmlfile) or die("Error!!");
@@ -60,8 +64,11 @@ class MakeNews extends Command
                 $taggedBody = $this->replaceXmlBody($taggedBody, $imgPath);
                 $prevImg = $xml->NewsContent->AppendData->FileName;
 
-                if (isset($prevImg)) $preview_img = $imgPath . $prevImg;
-                else $preview_img = null;
+                if (isset($prevImg)) {
+                    $preview_img = $imgPath . $prevImg;
+                } else {
+                    $preview_img = null;
+                }
 
                 $body = str_replace("\n", ' ', $xml->NewsContent->Body);
                 $preview_content = iconv_substr($body, 0, 100, "UTF-8");
@@ -88,14 +95,18 @@ class MakeNews extends Command
         $taggedBody = str_replace("\n", '<br/>', $taggedBody);
 
         $pattern = '/<YNAPHOTO(.+?)\/>/';
-        $result = preg_replace_callback($pattern, function ($matches) use($imgPath){
+        $result = preg_replace_callback($pattern, function ($matches) use ($imgPath) {
             preg_match("/path='(.*?)'/", $matches[1], $path);
             preg_match("/title='(.*?)'/", $matches[1], $title);
             preg_match("/caption='(.*?)'/", $matches[1], $caption);
 
             $result = "<img src='/" . $imgPath . $path[1] . "' />";
-            if (isset($title[1])) $result .= "<br><strong>" . $title[1] . "</strong>";
-            if (isset($caption[1])) $result .= "<p>" .$caption[1] . "</p>";
+            if (isset($title[1])) {
+                $result .= "<br><strong>" . $title[1] . "</strong>";
+            }
+            if (isset($caption[1])) {
+                $result .= "<p>" .$caption[1] . "</p>";
+            }
 
             return $result;
         }, $taggedBody);

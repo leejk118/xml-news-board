@@ -13,13 +13,13 @@ class ArticleController extends Controller
      */
     public function index(Request $request)
     {
-        $articles = \App\Article::where(function($query) use ($request) {
+        $articles = \App\Article::where(function ($query) use ($request) {
             if ($request->q != null) {
                 $category = $request->category;
                 if ($category == 'both') {
                     $query->orWhere('title', 'like', '%' . $request->q  . '%');
                     $query->orWhere('content', 'like', '%' . $request->q  . '%');
-                } else if ($category == 'title' || $category == 'content') {
+                } elseif ($category == 'title' || $category == 'content') {
                     $query->orWhere($request->category, 'like', '%' . $request->q  . '%');
                 }
             }
