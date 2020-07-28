@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use http\QueryString;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ArticleController extends Controller
 {
@@ -24,9 +25,13 @@ class ArticleController extends Controller
                     $query->orWhere($request->category, 'like', '%' . $request->q  . '%');
                 }
             }
-        })->orderBy('id', 'desc')->paginate(20);
+        })->orderBy('id', 'desc')->paginate(10);
 
         $articles->appends(request()->query())->links();
+
+        if ($request->page > $articles->lastPage()){
+            return redirect(route('articles.index'));
+        }
 
         return view('articles.index', compact('articles'));
     }
@@ -60,7 +65,7 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        $article = \App\Article::find($id);
+        $article = \App\Article::findorfail($id);
 
         $article->view_count += 1;
         $article->save();

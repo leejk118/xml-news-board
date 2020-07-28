@@ -535,13 +535,22 @@
         return view('articles.show', ['article' => \App\Article::find($id)]);
         ```
       
+- 마지막 페이지에 1개 남은 컨텐츠 삭제 시 페이지 이동 / 마지막 페이지 일괄 삭제 시 ?
+    > 페이징 넘어갈 경우 처리 (총 40페이지인경우 page=41을 줄 경우)
+    - $article이 LengthAwarePaginator 객체이므로, lastPage값과 비교하여 넘을 시 초기 페이지로 리다이렉트
+     ```php 
+        if ($request->page > $articles->lastPage()){
+            return redirect(route('articles.index'));
+        }
+    ```
+  
+- 뉴스 detail 페이지에서 삭제 시 이슈
 ~~- 검색 후 수정/삭제 기능 구현(마찬가지로 삭제 시 해당 페이지, 수정 시 해당 detail 페이지)~~
 - 로그인/로그아웃 시 현재 페이지 유지(수정/삭제 아닌 경우)          
 - 뉴스 detail 페이지에서 수정/삭제/목록으로 기능 구현 - 비로그인 시에는 목록으로 만 보이게
-- 마지막 페이지에 1개 남은 컨텐츠 삭제 시 페이지 이동 / 마지막 페이지 일괄 삭제 시 ?
-- 뉴스 detail 페이지에서 삭제 시  이슈
+- old 기능 추가
 
-- 페이징 넘어갈 경우 처리 (총 40페이지인경우 page=41을 줄 경우)
+
 
 - ArticlesController@index 리팩토링
     - before
@@ -587,5 +596,21 @@
         - https://github.com/laravel/framework/issues/19441
 
 
+## 예외처리
+- 존재하지 않는 id로 접근
+    > articles/101010 등
+    - find() -> findorfail($id)로 수정
+    - app/Exception/Handler.php
+        ```php 
+        if (app()->environment('local')){
+            if ($exception instanceof \Illuminate\Database\Eloquent\ModelNotFoundException){
+                return response(view('errors.notice', [
+                    'title' => '찾을 수 없습니다.',
+                    'description' => '죄송합니다! 요청하신 페이지가 없습니다.'
+                ]), 404);
+            }
+        }
+        ```
+                        
 
 ## 테스트
