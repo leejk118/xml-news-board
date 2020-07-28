@@ -4,21 +4,18 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <style type="text/css">
-        a { color:black; text-decoration:none; }
-
         .searchForm {
             display: inline-block;
             width:500px;
         }
-
-        .divCenter {
-            text-align: center;
-        }
-
         .iconBtn {
             font-family: FontAwesome;
             background: none;
             border: none;
+        }
+        .pagingList {
+            width : max-content;
+            margin : auto;
         }
     </style>
 @stop
@@ -31,13 +28,14 @@
         <hr>
 
         @auth
-            <div style="text-align: right">
-                <button id="deleteAll" onclick="button_click()" class="btn btn-danger">일괄삭제</button>
+            <div class="text-right">
+                <button id="selectBox" onclick="selectAll()" class="btn btn-secondary">전체선택</button>
+                <button onclick="deleteAll()" class="btn btn-danger">일괄삭제</button>
             </div>
         @endauth
         <br>
 
-        <table class="table"  style="text-align: center">
+        <table class="table text-center">
             <tr>
                 <th>기사</th>
                 <th>등록일</th>
@@ -48,10 +46,10 @@
             </tr>
             @foreach($articles as $article)
                 <tr height="80px">
-                    <td width="700px" style="text-align: left;">
-                        <a href="articles/{{ $article->id }}">
+                    <td width="700px" class="text-left">
+                        <a href="articles/{{ $article->id }}" class="text-dark">
                             @if (isset($article->preview_img))
-                                <div style="float: left; margin-right: 30px">
+                                <div class="float-left mr-3">
                                     <img src="{{ $article->preview_img }}" width="120px" height="100px" >
                                 </div>
                             @endif
@@ -69,18 +67,15 @@
                     </td>
                     @auth
                         <td>
-                            <form action="{{ route('articles.destroy', $article->id) }}" method="post"
-                                        onsubmit="return confirm('삭제하시겠습니까?');" style="display: inline;">
+                            <form action="{{ route('articles.destroy', $article->id) }}" method="POST"
+                                        onsubmit="return confirm('삭제하시겠습니까?');" class="d-inline">
                                 {!! csrf_field() !!}
-                                <input type="hidden" name="_method" value="delete">
-                                <input class="iconBtn" style="color:red;" type="submit" value="&#xf1f8">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <input class="iconBtn text-info" type="submit" value="&#xf1f8">
                             </form>
-
-                            <form action="{{ route('articles.edit', $article->id) }}" method="GET"
-                                    style="display: inline;">
-                                <input class="iconBtn" style="color:green;" type="submit" value="&#xf044">
+                            <form action="{{ route('articles.edit', $article->id) }}" method="GET" class="d-inline">
+                                <input class="iconBtn text-success" type="submit" value="&#xf044">
                             </form>
-
                             <input type="checkbox" value="{{ $article->id }}">
                         </td>
                     @endauth
@@ -88,16 +83,15 @@
             @endforeach
         </table>
 
-        <div style="width: 525px; margin: auto">
+        <div class="pagingList">
             @if($articles->count())
                 {!! $articles->render() !!}
             @endif
         </div>
 
-
-        <div class="divCenter">
-            <form action="{{ route('articles.index') }}" method="get">
-                <select class="form-control " style="width: 200px; display: inline-block" name="category">
+        <div class="text-center">
+            <form action="{{ route('articles.index') }}" method="GET">
+                <select class="form-control d-inline w-auto" name="category">
                     <option value="both">제목 + 본문</option>
                     <option value="title">제목</option>
                     <option value="content">본문</option>
@@ -113,7 +107,16 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script>
-        function button_click(){
+        function selectAll(){
+            var current = $("#selectBox").html();
+            var btnValue = (current == "전체선택") ? "선택해제" : "전체선택";
+            var checked = (current == "전체선택") ? true : false;
+
+            $("input[type='checkbox']").prop("checked", checked);
+            $("#selectBox").html(btnValue);
+        }
+
+        function deleteAll(){
             var target = $("input[type='checkbox']").filter(':checked');
 
             if (target.length == 0) {

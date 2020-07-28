@@ -17,11 +17,12 @@ class ArticleController extends Controller
     {
         $articles = \App\Article::where(function($query) use ($request) {
             if ($request->q != null){
-                if ($request->category == 'both'){
+                $category = $request->category;
+                if ($category == 'both'){
                     $query->orWhere('title', 'like', '%' . $request->q  . '%');
                     $query->orWhere('content', 'like', '%' . $request->q  . '%');
                 }
-                else {
+                else if ($category == 'title' || $category == 'content') {
                     $query->orWhere($request->category, 'like', '%' . $request->q  . '%');
                 }
             }
@@ -81,7 +82,7 @@ class ArticleController extends Controller
      */
     public function edit($id)
     {
-        $article = \App\Article::find($id);
+        $article = \App\Article::findorfail($id);
 
         return view('articles.edit', compact('article'));
     }
@@ -103,7 +104,7 @@ class ArticleController extends Controller
                             'content' => $content,
                             'preview_content' => $previewContent]);
 
-        return view('articles.show', ['article' => \App\Article::find($id)]);
+        return view('articles.show', ['article' => \App\Article::findorfail($id)]);
     }
 
     /**

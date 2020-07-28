@@ -545,9 +545,10 @@
     ```
   
 - 뉴스 detail 페이지에서 삭제 시 이슈
+- 뉴스 detail 페이지에서 수정 후 목록으로 이동 시 이슈
 ~~- 검색 후 수정/삭제 기능 구현(마찬가지로 삭제 시 해당 페이지, 수정 시 해당 detail 페이지)~~
 - 로그인/로그아웃 시 현재 페이지 유지(수정/삭제 아닌 경우)          
-- 뉴스 detail 페이지에서 수정/삭제/목록으로 기능 구현 - 비로그인 시에는 목록으로 만 보이게
+~~- 뉴스 detail 페이지에서 수정/삭제/목록으로 기능 구현 - 비로그인 시에는 목록으로 만 보이게~~
 - old 기능 추가
 
 
@@ -611,6 +612,57 @@
             }
         }
         ```
-                        
+- errors/notice.blade.php
+    ```php 
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="utf-8">
+            <title>{{ $title }}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+            <style>
+                * { line-height: 1.5; margin: 0; }
+                html { color : #888; font-family: Sans-serif; text-align: center; }
+                body { left:50%; margin : -43px 0 0 -150px; position: absolute; top:50%; width: 300px; }
+                h1 { color : #555; font-size: 2em; font-weight: 400; }
+                p {line-height: 1.2;}
+                @media only screen and (max-width: 400px) {
+                    body { margin: 10px auto; position: static; width: 95%; }
+                    h1 { font-size: 1.5em;}
+                }
+                a {
+                    text-decoration: none;
+                    color: black;
+                    font-size: 15px;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>{{ $title }}</h1>
+            <p> {{ $description }}</p>
+            <br>
+        <a href="/">
+            <button class="btn btn-primary">홈으로 이동</button>
+        </a>
+        </body>
+    </html>
+    ```                        
+
+## 부가기능
+- 전체선택/해제 기능 추가
+    - 참고 : https://hellogk.tistory.com/5
+    - index.blade.php
+        ```php 
+        <button id="selectBox" onclick="selectAll()" class="btn btn-secondary">전체선택</button>
+        ...
+        function selectAll(){
+            var current = $("#selectBox").html();
+            var btnValue = (current == "전체선택") ? "선택해제" : "전체선택";
+            var checked = (current == "전체선택") ? true : false;
+    
+            $("input[type='checkbox']").prop("checked", checked);
+            $("#selectBox").html(btnValue);
+        }
+        ```
 
 ## 테스트
