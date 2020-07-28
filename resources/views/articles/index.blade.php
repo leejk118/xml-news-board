@@ -47,7 +47,7 @@
             @foreach($articles as $article)
                 <tr height="80px">
                     <td width="700px" class="text-left">
-                        <a href="articles/{{ $article->id }}" class="text-dark">
+                        <a href="articles/{{ $article->id }}" class="text-dark" >
                             @if (isset($article->preview_img))
                                 <div class="float-left mr-3">
                                     <img src="{{ $article->preview_img }}" width="120px" height="100px" >
@@ -102,6 +102,7 @@
         </div>
     </div>
 @stop
+
 
 @section('script')
     <meta name="csrf-token" content="{{ csrf_token() }}">

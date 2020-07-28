@@ -42,12 +42,11 @@ class MakeNews extends Command
         $dirs = scandir($newsDir);
 
         foreach ($dirs as $dateDir) {
-
             if (is_dir($dateDir)) continue;
 
             $articles = scandir($newsDir . "/" . $dateDir);
 
-            foreach ($articles as $article){
+            foreach ($articles as $article) {
                 $ext = pathinfo($article);
                 if($ext['extension'] != 'xml') continue;
 
@@ -75,7 +74,8 @@ class MakeNews extends Command
         return 0;
     }
 
-    public function getImgPath(string $date){
+    public function getImgPath(string $date)
+    {
         $year = substr($date, 0, 4);
         $month = substr($date, 4, 2);
         $day = substr($date, 6, 2);
@@ -83,7 +83,8 @@ class MakeNews extends Command
         return "news_img/" . $year . "/" . $month . "/" . $day . "/";
     }
 
-    public function replaceXmlBody($taggedBody, $imgPath){
+    public function replaceXmlBody($taggedBody, $imgPath)
+    {
         $taggedBody = str_replace("\n", '<br/>', $taggedBody);
 
         $pattern = '/<YNAPHOTO(.+?)\/>/';
@@ -102,17 +103,18 @@ class MakeNews extends Command
         return $result;
     }
 
-    public function saveNewsImg($imgs, $imgPath, $sendDate){
-        foreach ($imgs as $img){
-            if (!file_exists("public/" . $imgPath)){
+    public function saveNewsImg($imgs, $imgPath, $sendDate)
+    {
+        foreach ($imgs as $img) {
+            if (!file_exists("public/" . $imgPath)) {
                 mkdir("public/" . $imgPath, 0777, true);
             }
-
             $this->searchFile($img->FileName, $sendDate);
         }
     }
 
-    public function searchFile($filename, $sendDate) {
+    public function searchFile($filename, $sendDate)
+    {
         $dateDir = substr($sendDate, 0, 4) . "-" . substr($sendDate, 4, 2)
             . "-" . substr($sendDate, 6, 2);
 
@@ -120,16 +122,18 @@ class MakeNews extends Command
 
         $files = scandir($newsDir);
 
-        foreach ($files as $file){
-            if ($file == $filename){
-                copy($newsDir . "/" . $file, public_path() . "/" . $this->getImgPath($sendDate) . $filename);
+        foreach ($files as $file) {
+            if ($file == $filename) {
+                copy($newsDir . "/" . $file, public_path() . "/" .
+                    $this->getImgPath($sendDate) . $filename);
                 echo $file . " copied\n";
                 break;
             }
         }
     }
 
-    public function insertDB($xml, $taggedBody, $sendDate, $preview_img, $preview_content){
+    public function insertDB($xml, $taggedBody, $sendDate, $preview_img, $preview_content)
+    {
         \App\Article::create([
             'title' => $xml->NewsContent->Title,
             'subtitle' => $xml->NewsContent->SubTitle,

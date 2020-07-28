@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use http\QueryString;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class ArticleController extends Controller
 {
@@ -16,13 +14,12 @@ class ArticleController extends Controller
     public function index(Request $request)
     {
         $articles = \App\Article::where(function($query) use ($request) {
-            if ($request->q != null){
+            if ($request->q != null) {
                 $category = $request->category;
-                if ($category == 'both'){
+                if ($category == 'both') {
                     $query->orWhere('title', 'like', '%' . $request->q  . '%');
                     $query->orWhere('content', 'like', '%' . $request->q  . '%');
-                }
-                else if ($category == 'title' || $category == 'content') {
+                } else if ($category == 'title' || $category == 'content') {
                     $query->orWhere($request->category, 'like', '%' . $request->q  . '%');
                 }
             }
@@ -30,7 +27,7 @@ class ArticleController extends Controller
 
         $articles->appends(request()->query())->links();
 
-        if ($request->page > $articles->lastPage()){
+        if ($request->page > $articles->lastPage()) {
             return redirect(route('articles.index'));
         }
 
@@ -120,7 +117,8 @@ class ArticleController extends Controller
         return back();
     }
 
-    public function destroys(Request $request){
+    public function destroys(Request $request)
+    {
         $list = json_decode($request->getContent(), true);
 
         foreach ($list['data'] as $id) {
