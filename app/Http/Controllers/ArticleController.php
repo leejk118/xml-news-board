@@ -93,16 +93,13 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, \App\Article $article)
+    public function update(\App\Http\Requests\ArticleRequest $request, \App\Article $article)
     {
-        $content = $request->ir1;
-        $previewContent = iconv_substr(preg_replace("/<(.+?)>/", "", $content), 0, 100, "UTF-8");
+        $previewContent = iconv_substr(preg_replace("/<(.+?)>/", "",
+                                            $request->all()['content']), 0, 100, "UTF-8");
+        $request->merge(['preview_content' => $previewContent]);
 
-        $article->title = $request->title;
-        $article->content = $content;
-        $article->preview_content = $previewContent;
-
-        $article->save();
+        $article->update($request->all());
 
         return redirect(route('articles.show', [$article->id, $request->queryString]));
     }

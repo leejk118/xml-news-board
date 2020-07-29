@@ -695,6 +695,40 @@
       - auth 미들웨어가 GET /login으로 리디렉션한다. /login이 없을 경우 에러 발생
 
 
-
+## 유효성 검사
+- form requests 생성
+    - `php artisan make:request ArticleRequest`
 
 ## 테스트
+
+
+## 기타
+- 라라벨 request 파라미터 변경
+    - https://stackoverflow.com/questions/36812476/how-to-change-value-of-a-request-parameter-in-laravel
+
+
+
+### TODO
+- Major
+    - makenews.php 리팩토링
+    - 유효성 검사
+    - 예외처리
+    - 테스트코드
+    - DB 최적화
+- Minor
+    - 검색 old, 수정 old
+    - 페이징
+    - 조회수
+    - 로그인
+    - restful api 구현
+- Additional
+    - xml파일 적재과정
+    - news show page 꾸미기
+    - 어제의 주요뉴스
+    - n개씩 보기
+    - 조회수 or 일자별 정렬?
+    - FULLTEXT search
+    - 스마트 에디터 이미지 처리 및 미리보기    
+    - 좋아요 기능
+    - 태그 기능?
+    - 최근 본or 즐겨찾기한 뉴스 기능
