@@ -113,14 +113,11 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(\App\Article $article)
+    public function destroy(Request $request, \App\Article $article)
     {
         $article->delete();
 
-        dd(\request());
-
-        return back();
-//        return response()->json([], 204);
+        return redirect('articles?' . $request->queryString);
     }
 
     public function destroys(Request $request)

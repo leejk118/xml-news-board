@@ -70,12 +70,13 @@
                             <form action="{{ route('articles.destroy', $article->id) }}" method="POST"
                                         onsubmit="return confirm('삭제하시겠습니까?');" class="d-inline">
                                 {!! csrf_field() !!}
+                                <input type="hidden" name="queryString" value="{{ $_SERVER['QUERY_STRING'] }}">
                                 <input type="hidden" name="_method" value="DELETE">
                                 <input class="iconBtn text-info" type="submit" value="&#xf1f8">
                             </form>
-                            <form action="{{ route('articles.edit', $article->id) }}" method="GET" class="d-inline">
+                            <a href="{{ route('articles.edit', [$article->id, $_SERVER['QUERY_STRING']]) }}">
                                 <input class="iconBtn text-success" type="submit" value="&#xf044">
-                            </form>
+                            </a>
                             <input type="checkbox" value="{{ $article->id }}">
                         </td>
                     @endauth
