@@ -665,4 +665,28 @@
         }
         ```
 
+## 기타 
+- php-cs-fixer
+    - PSR2 문법 적용
+    - 설치
+        - `composer global require friendsofphp/php-cs-fixer`
+    - 실행(파일 or 디렉토리)   
+        - `php-cs-fixer fix app`
+        - app 디렉토리에 있는 php 파일들 수정됨
+        
+
+## 인증 처리
+- <이슈> 로그인 하지 않아도 url에 articles/{id}/edit로 접근할 지 수정가능
+    - ArticleController에 auth 미들웨어 추가
+        ```php 
+            public function __construct()
+            {
+                $this->middleware('auth', ['except' => ['index', 'show']]);
+            }
+        ```
+      - auth 미들웨어가 GET /login으로 리디렉션한다. /login이 없을 경우 에러 발생
+
+
+
+
 ## 테스트

@@ -6,6 +6,11 @@ use Illuminate\Http\Request;
 
 class ArticleController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => ['index', 'show']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -25,8 +30,6 @@ class ArticleController extends Controller
             }
         })->orderBy('id', 'desc')->paginate(10);
 
-        $articles->appends(request()->query())->links();
-
         if ($request->page > $articles->lastPage()) {
             return redirect(route('articles.index'));
         }
@@ -41,7 +44,7 @@ class ArticleController extends Controller
      */
     public function create()
     {
-        //
+        return "<h1> create Page</h1>";
     }
 
     /**
@@ -52,7 +55,7 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return "<h1>store page</h1>";
     }
 
     /**
@@ -61,10 +64,8 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(\App\Article $article)
     {
-        $article = \App\Article::findorfail($id);
-
         $article->view_count += 1;
         $article->save();
 
@@ -77,10 +78,8 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(\App\Article $article)
     {
-        $article = \App\Article::findorfail($id);
-
         return view('articles.edit', compact('article'));
     }
 
@@ -91,17 +90,18 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, \App\Article $article)
     {
         $content = $request->ir1;
         $previewContent = iconv_substr(preg_replace("/<(.+?)>/", "", $content), 0, 100, "UTF-8");
 
-        \App\Article::where('id', $id)
-                    ->update(['title' => $request->title,
-                            'content' => $content,
-                            'preview_content' => $previewContent]);
+        $article->title = $request->title;
+        $article->content = $content;
+        $article->preview_content = $previewContent;
 
-        return view('articles.show', ['article' => \App\Article::findorfail($id)]);
+        $article->save();
+
+        return redirect(route('articles.show', $article->id));
     }
 
     /**
@@ -110,11 +110,14 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(\App\Article $article)
     {
-        \App\Article::destroy($id);
+        $article->delete();
+
+        dd(\request());
 
         return back();
+//        return response()->json([], 204);
     }
 
     public function destroys(Request $request)

@@ -6,16 +6,16 @@
 
 @section('content')
     <div class="container">
-        <form action="{{ route('articles.update', $article->id) }}" method="POST">
+        <form action="{{ route('articles.update', $article->id) }}" method="POST" onsubmit="return submitContents(this);">
             {!! csrf_field() !!}
             <input type="hidden" name="_method" value="PUT">
-            제목
-            <input type="text" class="input-group" name="title" value="{{ $article->title }}"><br><br>
+            <h1>제목</h1>
+            <input type="text" style="width: 766px" name="title" value="{{ $article->title }}"><br><br><br>
 
-            <textarea name="ir1" id="ir1" rows="10" cols="100" style="width:766px; height:412px;">
+            <textarea name="ir1" id="ir1" rows="10" cols="100" style="width:766px; height:412px; ">
                 {{ $article->content }}
             </textarea>
-            <input type="submit" value="저장하기" onclick="submitContents(this)"/>
+            <button class="btn btn-primary">저장하기</button>
         </form>
     </div>
 
@@ -29,13 +29,11 @@
         });
 
         function submitContents(e){
+            if (!confirm("수정하시겠습니까?")){
+                return false;
+            }
             oEditors.getById["ir1"].exec("UPDATE_CONTENTS_FIELD", []);
-
-            try {
-                e.form.submit();
-            }
-            catch(ex){
-            }
+            alert("수정완료");
         }
     </script>
 @endsection

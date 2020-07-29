@@ -8,23 +8,49 @@ use Tests\TestCase;
 
 class ArticleControllerTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-    public function testExample()
-    {
-        $response = $this->getJson('/articles', ['q' => '전자', 'category' => 'both']);
-
-//        $response = $this->getJson('/articles');
+    public function testArticleControllerIndex(){
+        $response = $this->get('/articles');
 
         $response
-            ->assertStatus(200);
-//            ->assertJson(['title' => "ss"]);
-
-//        $content = $this->call('GET', '/articles')->getContent();
-
+            ->assertStatus(200)
+            ->assertSeeText("Saramin");
     }
+
+    public function testArticleControllerShow(){
+        $response = $this->get('/articles/3189');
+
+        $response
+            ->assertStatus(200)
+            ->assertSee('목록으로');
+    }
+
+//    public function testArticleControllerDestroy(){
+//        $response = $this->delete("articles", []);
+//    }
+//
+//    public function testArticleControllerDestroyAll(){
+//
+//    }
+//
+    public function testArticleControllerEditByGuest(){
+        $response = $this->get("/articles/3189/edit");
+
+        $response
+            ->assertStatus(302)
+            ->assertSee("login");
+    }
+
+    public function testArticleControllerEditByAdmin(){
+        $user = auth()->loginUsingId(1);
+
+        $response = $this->actingAs($user)->get("/articles/3189/edit");
+
+        $response
+            ->assertSee(200);
+    }
+//
+//    public function testArticleControllerUpdate(){
+//
+//    }
 
 }
