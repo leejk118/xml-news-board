@@ -38,47 +38,53 @@ class MakeNews extends Command
     public function handle()
     {
         $newsDir = public_path() . "/news";
+        $newsDateDirs = scandir($newsDir);
 
-        $dirs = scandir($newsDir);
-
-        foreach ($dirs as $dateDir) {
-            if (is_dir($dateDir)) {
+        foreach ($newsDateDirs as $newsDateDir) {
+            $newsPathDir = $newsDir . "/" . $newsDateDir;
+            if (!is_dir($newsPathDir) || $newsDateDir == '.' || $newsDateDir == '..') {
                 continue;
             }
 
-            $articles = scandir($newsDir . "/" . $dateDir);
-
-            foreach ($articles as $article) {
-                $ext = pathinfo($article);
+            $articlesXml = scandir($newsPathDir);
+            foreach ($articlesXml as $articleXml) {
+                $ext = pathinfo($articleXml);
                 if ($ext['extension'] != 'xml') {
                     continue;
                 }
 
-                $xmlfile = $newsDir . "/" . $dateDir . "/" . $article;
-                $xml = simplexml_load_file($xmlfile) or die("Error!!");
-
-                $sendDate = $xml->Header->SendDate;
-                $taggedBody = $xml->NewsContent->TaggedBody;
-
-                $imgPath = $this->getImgPath($sendDate);
-                $taggedBody = $this->replaceXmlBody($taggedBody, $imgPath);
-                $prevImg = $xml->NewsContent->AppendData->FileName;
-
-                if (isset($prevImg)) {
-                    $preview_img = $imgPath . $prevImg;
-                } else {
-                    $preview_img = null;
+                $xml = simplexml_load_file($newsPathDir . "/" . $articleXml);
+                if ($xml === false){
+                    echo "Failed Loading XML\n";
+                    foreach (libxml_get_errors() as $error){
+                        echo $error->message . "\t";
+                    }
+                    continue;
                 }
 
-                $body = str_replace("\n", ' ', $xml->NewsContent->Body);
-                $preview_content = iconv_substr($body, 0, 100, "UTF-8");
+                $newsContent = $xml->NewsContent;
+                $imgPath = $this->getImgPath($xml->Header->SendDate);
 
-                $this->saveNewsImg($xml->NewsContent->AppendData, $imgPath, $sendDate);
-                $this->insertDB($xml, $taggedBody, $sendDate, $preview_img, $preview_content);
+                $taggedBody = $this->getTaggedBody($newsContent->TaggedBody, $imgPath);
+                $preview_img = $this->getPreviewImg($newsContent->AppendData->FileName, $imgPath);
+                $preview_content = $this->getPreviewContent($newsContent->Body);
+
+                $this->saveNewsImg($newsContent->AppendData, $imgPath, $xml->Header->SendDate);
+                $this->insertDB($xml, $taggedBody, $preview_img, $preview_content);
             }
         }
 
         return 0;
+    }
+
+    public function getPreviewImg($prevImg, $imgPath)
+    {
+        return (isset($prevImg)) ? $imgPath . $prevImg : null;
+    }
+
+    public function getPreviewContent($body)
+    {
+        return iconv_substr(str_replace("\n", ' ', $body), 0, 100, "UTF-8");
     }
 
     public function getImgPath(string $date)
@@ -90,7 +96,7 @@ class MakeNews extends Command
         return "news_img/" . $year . "/" . $month . "/" . $day . "/";
     }
 
-    public function replaceXmlBody($taggedBody, $imgPath)
+    public function getTaggedBody($taggedBody, $imgPath)
     {
         $taggedBody = str_replace("\n", '<br/>', $taggedBody);
 
@@ -101,12 +107,8 @@ class MakeNews extends Command
             preg_match("/caption='(.*?)'/", $matches[1], $caption);
 
             $result = "<img src='/" . $imgPath . $path[1] . "' />";
-            if (isset($title[1])) {
-                $result .= "<br><strong>" . $title[1] . "</strong>";
-            }
-            if (isset($caption[1])) {
-                $result .= "<p>" .$caption[1] . "</p>";
-            }
+            $result .= (isset($title[1])) ? "<br><strong>" . $title[1] . "</strong>" : "";
+            $result .= (isset($caption[1])) ? "<p>" .$caption[1] . "</p>" : "";
 
             return $result;
         }, $taggedBody);
@@ -143,13 +145,13 @@ class MakeNews extends Command
         }
     }
 
-    public function insertDB($xml, $taggedBody, $sendDate, $preview_img, $preview_content)
+    public function insertDB($xml, $taggedBody, $preview_img, $preview_content)
     {
         \App\Article::create([
             'title' => $xml->NewsContent->Title,
             'subtitle' => $xml->NewsContent->SubTitle,
             'content' => $taggedBody,
-            'send_date' => $sendDate,
+            'send_date' => $xml->Header->SendDate,
             'news_link' => $xml->Metadata->Href,
             'preview_img' => $preview_img,
             'preview_content' => $preview_content

@@ -698,6 +698,31 @@
 ## 유효성 검사
 - form requests 생성
     - `php artisan make:request ArticleRequest`
+- ArticleRequest.php
+    - ```php 
+       public function rules()
+        {
+            return [
+                'title' => 'required | max:100',
+                'subtitle' => 'max:150',
+                'news_link' => 'required | max:100',
+                'content' => 'required | max:7000',
+            ];
+        }
+        ```
+- ArticleController.php
+    - ```php 
+        public function update(\App\Http\Requests\ArticleRequest $request, \App\Article $article)
+        {
+            $previewContent = iconv_substr(preg_replace("/<(.+?)>/", "",
+                                                $request->all()['content']), 0, 100, "UTF-8");
+            $request->merge(['preview_content' => $previewContent]);
+    
+            $article->update($request->all());
+    
+            return redirect(route('articles.show', [$article->id, $request->queryString]));
+        }
+      ```          
 
 ## 테스트
 
