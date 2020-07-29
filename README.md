@@ -544,8 +544,16 @@
         }
     ```
   
-- 뉴스 detail 페이지에서 삭제 시 이슈
-- 뉴스 detail 페이지에서 수정 후 목록으로 이동 시 이슈
+- 뉴스 detail 페이지에서 삭제 시 이슈 & 뉴스 detail 페이지에서 수정 후 목록으로 이동 시 이슈
+    - queryString 유지하며 페이지 이동 처리
+    -  `<a href="{{ route('articles.show', [$article->id, $_SERVER['QUERY_STRING']]) }}" class="text-dark" >`
+    - ```html 
+        <form action="{{ route('articles.update', $article->id) }}" method="POST" onsubmit="return submitContents(this);">
+            @csrf
+            <input type="hidden" name="_method" value="PUT">
+            <input type="hidden" name="queryString" value="{{ $_SERVER['QUERY_STRING'] }}">
+        ```
+      
 ~~- 검색 후 수정/삭제 기능 구현(마찬가지로 삭제 시 해당 페이지, 수정 시 해당 detail 페이지)~~
 - 로그인/로그아웃 시 현재 페이지 유지(수정/삭제 아닌 경우)          
 ~~- 뉴스 detail 페이지에서 수정/삭제/목록으로 기능 구현 - 비로그인 시에는 목록으로 만 보이게~~

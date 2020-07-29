@@ -66,10 +66,11 @@ class ArticleController extends Controller
      */
     public function show(\App\Article $article)
     {
+        $queryString = request()->getQueryString();
         $article->view_count += 1;
         $article->save();
 
-        return view('articles.show', compact('article'));
+        return view('articles.show', compact('article', 'queryString'));
     }
 
     /**
@@ -80,7 +81,9 @@ class ArticleController extends Controller
      */
     public function edit(\App\Article $article)
     {
-        return view('articles.edit', compact('article'));
+        $queryString = request()->getQueryString();
+
+        return view('articles.edit', compact('article', 'queryString'));
     }
 
     /**
@@ -101,7 +104,7 @@ class ArticleController extends Controller
 
         $article->save();
 
-        return redirect(route('articles.show', $article->id));
+        return redirect(route('articles.show', [$article->id, $request->queryString]));
     }
 
     /**

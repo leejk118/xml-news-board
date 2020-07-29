@@ -7,8 +7,9 @@
 @section('content')
     <div class="container">
         <form action="{{ route('articles.update', $article->id) }}" method="POST" onsubmit="return submitContents(this);">
-            {!! csrf_field() !!}
+            @csrf
             <input type="hidden" name="_method" value="PUT">
+            <input type="hidden" name="queryString" value="{{ $_SERVER['QUERY_STRING'] }}">
             <h1>제목</h1>
             <input type="text" style="width: 766px" name="title" value="{{ $article->title }}"><br><br><br>
 

@@ -19,20 +19,23 @@
         <br>
         <br>
 
-        <a href="javascript:window.history.back();">
+        <a href='/articles?{{ $queryString }}'>
             <button class="btn btn-primary">목록으로</button>
         </a>
         @auth
             <form action="{{ route('articles.destroy', $article->id) }}" method="post"
                   onsubmit="return confirm('삭제하시겠습니까?');" class="d-inline">
-                {!! csrf_field() !!}
+                @csrf
                 <input type="hidden" name="_method" value="delete">
                 <button class="btn btn-danger">삭제하기</button>
             </form>
 
-            <form action="{{ route('articles.edit', $article->id) }}" method="GET" class="d-inline">
+            <a href="{{ route('articles.edit', [$article, $_SERVER['QUERY_STRING']]) }}">
                 <button class="btn btn-dark">수정하기</button>
-            </form>
+            </a>
+{{--            <form action="{{ route('articles.edit', [$article, $_SERVER['QUERY_STRING']]) }}" method="GET" class="d-inline">--}}
+{{--                <button class="btn btn-dark">수정하기</button>--}}
+{{--            </form>--}}
         @endauth
     </div>
 @stop

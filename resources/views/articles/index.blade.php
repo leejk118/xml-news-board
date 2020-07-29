@@ -47,7 +47,7 @@
             @foreach($articles as $article)
                 <tr height="80px">
                     <td width="700px" class="text-left">
-                        <a href="{{ route('articles.show', $article->id) }}" class="text-dark" >
+                        <a href="{{ route('articles.show', [$article->id, $_SERVER['QUERY_STRING']]) }}" class="text-dark" >
                             @if (isset($article->preview_img))
                                 <div class="float-left mr-3">
                                     <img src="{{ $article->preview_img }}" width="120px" height="100px" >
