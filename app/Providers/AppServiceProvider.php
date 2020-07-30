@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +24,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        view()->composer("*", function($view){
+            $newsHistories = Cache::remember('newsHistories', "" , function(){
+                return \App\NewsHistory::where('send_date', '=', '2020-07-16')->
+                                with('article')->orderBy('id', 'desc')->limit(5)->get();
+            });
+
+            $view->with(compact('newsHistories'));
+        });
     }
 }

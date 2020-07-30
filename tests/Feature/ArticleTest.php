@@ -17,6 +17,7 @@ class ArticleTest extends TestCase
     {
         $response = $this->get('/articles');
 
+//        $this->assertDatabaseHas('articles');
         $response->assertStatus(200);
     }
 }

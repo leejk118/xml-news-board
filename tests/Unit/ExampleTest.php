@@ -14,6 +14,9 @@ class ExampleTest extends TestCase
     public function testBasicTest()
     {
         $this->assertTrue(true);
+
+
+//        $this->assertDatabaseHas('articles',[]);
 //        $this->visit('/');
     }
 

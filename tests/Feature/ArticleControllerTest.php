@@ -8,13 +8,13 @@ use Tests\TestCase;
 
 class ArticleControllerTest extends TestCase
 {
-    public function testArticleControllerIndex(){
-        $response = $this->get('/articles');
-
-        $response
-            ->assertStatus(200)
-            ->assertSeeText("Saramin");
-    }
+//    public function testArticleControllerIndex(){
+//        $response = $this->get('/articles');
+//
+//        $response
+//            ->assertStatus(200)
+//            ->assertSeeText("Saramin");
+//    }
 
     public function testArticleControllerShow(){
         $response = $this->get('/articles/3189');

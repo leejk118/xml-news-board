@@ -724,6 +724,62 @@
         }
       ```          
 
+## 어제의 주요뉴스 기능
+- 마이그레이션 생성
+    - `php artisan make:migration create_news_histories_table --create=news_histories`
+    - `php artisan migrate`
+    - create_news_histories_table.php
+        ```php 
+        public function up()
+        {
+            Schema::create('news_histories', function (Blueprint $table) {
+                $table->id();
+                $table->date('send_date');
+                $table->unsignedBigInteger('article_id');
+                $table->integer('view_count');
+        
+                $table->foreign('article_id')->references('id')
+                    ->on('articles');
+            });
+        }
+        ```
+- 모델
+    ```php
+   class NewsHistory extends Model
+   {
+       public $timestamps = false;
+   
+       protected $fillable = ['send_date', 'article_id', 'view_count'];
+   
+       public function article()
+       {
+           return $this->belongsTo(Article::class);
+       }
+   }
+    ```      
+
+- 뷰 컴포저(view composer)
+    - 컨트롤러에서 뷰를 반환할 때마다 태그 목록을 변수에 담아 넘기는 것은 깔끔하지 않음
+    - AppServiceProvider.php
+        ```php 
+        public function boot()
+        {
+            view()->composer("*", function($view){
+                $newsHistories = \Cache::rememberForever('newsHistories.list', function(){
+                    return \App\NewsHistory::where('send_date', '=', '2020-07-28')->get();
+                });
+    
+                $view->with(compact('newsHistories'));
+            });
+        }
+        ```
+    - 어제의 주요뉴스를 하루동안 유지되기 때문에 하루가 지나지 않는 이상 변하지 않는다.
+    - 데이터 목록에 변화가 있을 경우 캐시 초기화 명령을 실행한다.
+        - `php artisan cache:clear`
+        
+              
+
+
 ## 테스트
 
 

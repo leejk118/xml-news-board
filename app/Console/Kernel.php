@@ -24,9 +24,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
-        $schedule->call(function () {
-        })->everyMinute();
+        $schedule->command('cache:clear');
+
+        $schedule->command('command:make-news-history')
+             ->appendOutputTo(storage_path('logs/make-news-history.log'));
     }
 
     /**
