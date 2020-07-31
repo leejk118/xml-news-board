@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Article;
+use App\Http\Requests\ArticleRequest;
 
 class ArticleController extends Controller
 {
@@ -18,17 +20,9 @@ class ArticleController extends Controller
      */
     public function index(Request $request)
     {
-        $articles = \App\Article::where(function ($query) use ($request) {
-            if ($request->q != null) {
-                $category = $request->category;
-                if ($category == 'both') {
-                    $query->orWhere('title', 'like', '%' . $request->q  . '%');
-                    $query->orWhere('content', 'like', '%' . $request->q  . '%');
-                } elseif ($category == 'title' || $category == 'content') {
-                    $query->orWhere($request->category, 'like', '%' . $request->q  . '%');
-                }
-            }
-        })->orderBy('id', 'desc')->paginate(10);
+        $articles = Article::category($request->category, $request->q)
+                            ->orderBy('id', 'desc')
+                            ->paginate(10);
 
         if ($request->page > $articles->lastPage()) {
             return redirect(route('articles.index'));
@@ -64,7 +58,7 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(\App\Article $article)
+    public function show(Article $article)
     {
         $queryString = request()->getQueryString();
         $article->view_count += 1;
@@ -79,7 +73,7 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(\App\Article $article)
+    public function edit(Article $article)
     {
         $queryString = request()->getQueryString();
 
@@ -93,7 +87,7 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(\App\Http\Requests\ArticleRequest $request, \App\Article $article)
+    public function update(ArticleRequest $request, Article $article)
     {
         $previewContent = iconv_substr(preg_replace("/<(.+?)>/", "",
                                             $request->all()['content']), 0, 100, "UTF-8");
@@ -110,7 +104,7 @@ class ArticleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, \App\Article $article)
+    public function destroy(Request $request, Article $article)
     {
         $article->delete();
 
@@ -122,7 +116,7 @@ class ArticleController extends Controller
         $list = json_decode($request->getContent(), true);
 
         foreach ($list['data'] as $id) {
-            \App\Article::destroy($id);
+            Article::destroy($id);
         }
     }
 }

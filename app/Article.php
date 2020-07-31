@@ -13,4 +13,21 @@ class Article extends Model
     {
         return $this->hasOne(NewsHistory::class);
     }
+
+    public function scopeCategory($query, $category, $q)
+    {
+        switch ($category){
+            case 'both':
+                $query->orWhere('title', 'like', '%'. $q . '%');
+                $query->orWhere('content', 'like', '%'. $q . '%');
+                break;
+            case 'title':
+            case 'content':
+                $query->where($category, 'like', '%'. $q . '%');
+                break;
+            default:
+                break;
+        }
+        return $query;
+    }
 }
