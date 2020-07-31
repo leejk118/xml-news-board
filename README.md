@@ -813,3 +813,32 @@
     - 좋아요 기능
     - 태그 기능?
     - 최근 본or 즐겨찾기한 뉴스 기능
+
+## TOKNOW
+> why -> how
+
+>line by line
+
+* web
+    - middleware
+    - session
+    - cookie
+    - service & repository
+    - **exception**
+    - **validation**
+    - **tdd**
+
+* php
+    - autoload
+    - trait
+    - namespace 와 use https://edykim.com/ko/post/php-namespace/
+    - mixed
+    - closure
+
+* laravel
+    - ioc
+    - service container 
+    - service provider
+    - facade
+    - local scope
+
