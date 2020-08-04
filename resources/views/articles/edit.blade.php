@@ -5,23 +5,27 @@
 @endsection
 
 @section('content')
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+{{--    @if ($errors->any())--}}
+{{--        <div class="alert alert-danger">--}}
+{{--            <ul>--}}
+{{--                @foreach ($errors->all() as $error)--}}
+{{--                    <li>{{ $error }}</li>--}}
+{{--                @endforeach--}}
+{{--            </ul>--}}
+{{--        </div>--}}
+{{--    @endif--}}
 
     <div class="container">
         <form action="{{ route('articles.update', $article->id) }}" method="POST" onsubmit="return submitContents(this);">
             @csrf
             <input type="hidden" name="_method" value="PUT">
             <input type="hidden" name="queryString" value="{{ $_SERVER['QUERY_STRING'] }}">
+
             <h1>제목</h1>
-            <input type="text" style="width: 766px" name="title" value="{{ $article->title }}"><br><br><br>
+            <input type="text" style="width: 766px" name="title" value="{{ $article->title }}">
+            {!! $errors->first('title', '<span class="form-error">:message</span>')!!}
+            <br><br><br>
+
             <h5>subtitle</h5>
             <input type="text" style="width: 766px" name="subtitle" value="{{ $article->subtitle }}"><br>
             <h5>기사링크</h5>
@@ -48,7 +52,6 @@
                 return false;
             }
             oEditors.getById["content"].exec("UPDATE_CONTENTS_FIELD", []);
-            alert("수정완료");
         }
     </script>
 @endsection

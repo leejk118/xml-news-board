@@ -25,8 +25,6 @@ Route::post('articles/destroy', [
     'uses' => 'ArticleController@destroys'
 ]);
 
-Route::get('/home', 'HomeController@index')->name('home');
-
 Route::get('auth/register', [
     'as' => 'users.create',
     'uses' => 'UserController@create'

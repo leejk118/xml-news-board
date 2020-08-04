@@ -95,6 +95,8 @@ class ArticleController extends Controller
 
         $article->update($request->all());
 
+        flash($article->id . '번 글이 수정 완료되었습니다.');
+
         return redirect(route('articles.show', [$article->id, $request->queryString]));
     }
 
@@ -107,6 +109,8 @@ class ArticleController extends Controller
     public function destroy(Request $request, Article $article)
     {
         $article->delete();
+
+        flash($article->id . '번 글이 삭제 완료되었습니다.');
 
         return redirect('articles?' . $request->queryString);
     }
