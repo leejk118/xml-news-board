@@ -25,6 +25,33 @@ Route::post('articles/destroy', [
     'uses' => 'ArticleController@destroys'
 ]);
 
-Auth::routes();
-
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('auth/register', [
+    'as' => 'users.create',
+    'uses' => 'UserController@create'
+]);
+Route::post('auth/register', [
+    'as' => 'users.store',
+    'uses' => 'UserController@store'
+]);
+Route::get('auth/confirm/{code}', [
+    'as' => 'users.confirm',
+    'uses' => 'UserController@confirm'
+])->where('code', '[\pL\-\pN]{60}');
+
+
+Route::get('auth/login', [
+    'as' => 'sessions.create',
+    'uses' => 'SessionController@create'
+]);
+Route::post('auth/login', [
+    'as' => 'sessions.store',
+    'uses' => 'SessionController@store'
+]);
+Route::get('auth/logout', [
+    'as' => 'sessions.destroy',
+    'uses' => 'SessionController@destroy'
+]);
+
+

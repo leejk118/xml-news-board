@@ -787,6 +787,36 @@
 - 라라벨 request 파라미터 변경
     - https://stackoverflow.com/questions/36812476/how-to-change-value-of-a-request-parameter-in-laravel
 
+## Custom Register & Login 기능
+- web.php
+    ```php
+    Route::get('auth/register', [
+        'as' => 'users.create',
+        'uses' => 'UserController@create'
+    ]);
+    Route::post('auth/register', [
+        'as' => 'users.store',
+        'uses' => 'UserController@store'
+    ]);
+    Route::get('auth/confirm/{code}', [
+        'as' => 'users.confirm',
+        'uses' => 'UserController@confirm'
+    ])->where('code', '');
+    
+    
+    Route::get('auth/login', [
+        'as' => 'sessions.create',
+        'uses' => 'SessionController@create'
+    ]);
+    Route::post('auth/login', [
+        'as' => 'sessions.store',
+        'uses' => 'SessionController@store'
+    ]);
+    Route::get('auth/logout', [
+        'as' => 'sessions.destroy',
+        'uses' => 'SessionController@destroy'
+    ]);
+    ```
 
 
 ### TODO
