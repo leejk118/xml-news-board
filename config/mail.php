@@ -40,7 +40,7 @@ return [
             'port' => 465, //env('MAIL_PORT', 587),
             'encryption' => 'ssl', //env('MAIL_ENCRYPTION', 'tls'),
             'username' => 'jkleesri@gmail.com', //env('MAIL_USERNAME'),
-            'password' => 'wmffkxks777', //env('MAIL_PASSWORD'),
+            'password' => , //env('MAIL_PASSWORD'),
             'timeout' => null,
             'auth_mode' => null,
         ],
