@@ -15,9 +15,10 @@ class ArticleTest extends TestCase
      */
     public function testExample()
     {
-        $response = $this->get('/articles');
+        $this->withoutExceptionHandling();
+        $response = $this->get('/');
 
 //        $this->assertDatabaseHas('articles');
-        $response->assertStatus(200);
+        $response->assertStatus(302);
     }
 }
