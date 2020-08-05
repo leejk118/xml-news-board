@@ -19,7 +19,8 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
         if (Auth::guard($guard)->check()) {
-            return redirect(RouteServiceProvider::HOME);
+            flash()->error('현재 사용자가 로그인 중입니다. 로그아웃을 하고 다시 시도해 주세요.');
+            return redirect(route('articles.index'));
         }
 
         return $next($request);

@@ -878,3 +878,6 @@
     - facade
     - local scope
 
+#### 로그인 상태로 회원가입 or 메일 인증 접속 시 이슈
+- https://wiki.modernpug.org/display/LAR/questions/14033275/middleware-guest%EC%97%90-%EA%B1%B8%EB%A6%AC%EB%A9%B4-redirect%EB%90%98%EB%8A%94-%EA%B3%B3-%EC%84%A4%EC%A0%95%ED%95%98%EB%8A%94%EB%B2%95
+- http kernel에서 guest alias 설정된 미들웨어인 RedirectIfAuthenticated 파일 수정 
