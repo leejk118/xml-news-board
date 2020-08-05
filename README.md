@@ -819,6 +819,12 @@
     ```
 
 
+## Article DB 최적화
+- doctrine/dbal 의존성 설치
+- migration 파일 만든 후 실행
+
+
+
 ### TODO
 - Major
     - makenews.php 리팩토링
