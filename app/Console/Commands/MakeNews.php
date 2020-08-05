@@ -20,6 +20,8 @@ class MakeNews extends Command
      */
     protected $description = 'Command description';
 
+    public $imgPath = '';
+
     /**
      * Create a new command instance.
      *
@@ -63,10 +65,10 @@ class MakeNews extends Command
                 }
 
                 $newsContent = $xml->NewsContent;
-                $imgPath = $this->getImgPath($xml->Header->SendDate);
+                $this->imgPath = $this->getImgPath($xml->Header->SendDate);
 
-                $taggedBody = $this->getTaggedBody($newsContent->TaggedBody, $imgPath);
-                $preview_img = $this->getPreviewImg($newsContent->AppendData->FileName, $imgPath);
+                $taggedBody = $this->getTaggedBody($newsContent->TaggedBody);
+                $preview_img = $this->getPreviewImg($newsContent->AppendData->FileName);
                 $preview_content = $this->getPreviewContent($newsContent->Body);
 
                 $this->saveNewsImg($newsContent->AppendData, $imgPath, $xml->Header->SendDate);
