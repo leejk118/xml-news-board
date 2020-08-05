@@ -24,13 +24,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        view()->composer("*", function($view){
-            $newsHistories = Cache::remember('newsHistories', "" , function(){
-                return \App\NewsHistory::where('send_date', '=', '2020-07-16')->
-                                with('article')->orderBy('id', 'desc')->limit(5)->get();
-            });
-
-            $view->with(compact('newsHistories'));
-        });
+//        view()->composer("*", function($view){
+//            $newsHistories = Cache::remember('newsHistories', "" , function(){
+//                return \App\NewsHistory::where('send_date', '=', '2020-07-16')->
+//                                with('article')->orderBy('id', 'desc')->limit(5)->get();
+//            });
+//
+//            $view->with(compact('newsHistories'));
+//        });
     }
 }

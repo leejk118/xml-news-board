@@ -112,7 +112,7 @@ class ArticleController extends Controller
 
         flash($article->id . '번 글이 삭제 완료되었습니다.');
 
-        return redirect('articles?' . $request->queryString);
+        return redirect(route('articles.index', $request->queryString));
     }
 
     public function destroys(Request $request)

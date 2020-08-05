@@ -30,4 +30,22 @@ class ArticleRequest extends FormRequest
             'content' => 'required | max:7000',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'required' => ':attribute 필수 입력 사항입니다.',
+            'max' => ':attribute 최대 :max글자 까지입니다.'
+        ];
+    }
+
+    public function attributes()
+    {
+        return [
+            'title' => '제목은',
+            'subtitle' => '부제목은',
+            'news_link' => '기사링크는',
+            'content' => '본문은'
+        ];
+    }
 }
