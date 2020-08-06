@@ -20,7 +20,7 @@ class MakeNews extends Command
      */
     protected $description = 'Command description';
 
-    public $imgPath = '';
+    public $imgPath;
 
     /**
      * Create a new command instance.
@@ -71,17 +71,19 @@ class MakeNews extends Command
                 $preview_img = $this->getPreviewImg($newsContent->AppendData->FileName);
                 $preview_content = $this->getPreviewContent($newsContent->Body);
 
-                $this->saveNewsImg($newsContent->AppendData, $imgPath, $xml->Header->SendDate);
+                $this->saveNewsImg($newsContent->AppendData, $xml->Header->SendDate);
                 $this->insertDB($xml, $taggedBody, $preview_img, $preview_content);
+
+                break;
             }
         }
 
         return 0;
     }
 
-    public function getPreviewImg($prevImg, $imgPath)
+    public function getPreviewImg($prevImg)
     {
-        return (isset($prevImg)) ? $imgPath . $prevImg : null;
+        return (isset($prevImg)) ? $this->imgPath . $prevImg : null;
     }
 
     public function getPreviewContent($body)
@@ -98,17 +100,17 @@ class MakeNews extends Command
         return "news_img/" . $year . "/" . $month . "/" . $day . "/";
     }
 
-    public function getTaggedBody($taggedBody, $imgPath)
+    public function getTaggedBody($taggedBody)
     {
-        $taggedBody = str_replace("\n", '<br/>', $taggedBody);
+        $taggedBody = str_replace("\n", '<br/><br/>', $taggedBody);
 
         $pattern = '/<YNAPHOTO(.+?)\/>/';
-        $result = preg_replace_callback($pattern, function ($matches) use ($imgPath) {
+        $result = preg_replace_callback($pattern, function ($matches) {
             preg_match("/path='(.*?)'/", $matches[1], $path);
             preg_match("/title='(.*?)'/", $matches[1], $title);
             preg_match("/caption='(.*?)'/", $matches[1], $caption);
 
-            $result = "<img src='/" . $imgPath . $path[1] . "' />";
+            $result = "<img src='/" . $this->imgPath . $path[1] . "' />";
             $result .= (isset($title[1])) ? "<br><strong>" . $title[1] . "</strong>" : "";
             $result .= (isset($caption[1])) ? "<p>" .$caption[1] . "</p>" : "";
 
@@ -118,11 +120,11 @@ class MakeNews extends Command
         return $result;
     }
 
-    public function saveNewsImg($imgs, $imgPath, $sendDate)
+    public function saveNewsImg($imgs, $sendDate)
     {
         foreach ($imgs as $img) {
-            if (!file_exists("public/" . $imgPath)) {
-                mkdir("public/" . $imgPath, 0777, true);
+            if (!file_exists("public/" . $this->imgPath)) {
+                mkdir("public/" . $this->imgPath, 0777, true);
             }
             $this->searchFile($img->FileName, $sendDate);
         }

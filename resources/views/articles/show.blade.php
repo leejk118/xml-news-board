@@ -4,13 +4,13 @@
     <div class="card mx-auto w-75">
         <div class="card-body">
             <h1><b>{{ $article->title }}</b></h1>
-            <hr>
             <div class="float-left">
                 <p>작성일 : {{ $article->send_date }}  </p>
             </div>
             <div class="text-right">
                 <p>조회수 : {{ $article->view_count }}</p>
             </div>
+            <hr>
 
             <br>
             <h3>{{ $article->subtitle }}</h3>
