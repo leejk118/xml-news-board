@@ -18,7 +18,7 @@ Route::get('/', function () {
     return redirect('articles');
 });
 
-Route::resource('articles', 'ArticleController');
+Route::resource('articles', 'ArticleController')->except(['create', 'store']);
 
 Route::post('articles/destroy', [
     'as' => 'articles.destroys',

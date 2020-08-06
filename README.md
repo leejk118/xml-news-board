@@ -881,3 +881,18 @@
 #### 로그인 상태로 회원가입 or 메일 인증 접속 시 이슈
 - https://wiki.modernpug.org/display/LAR/questions/14033275/middleware-guest%EC%97%90-%EA%B1%B8%EB%A6%AC%EB%A9%B4-redirect%EB%90%98%EB%8A%94-%EA%B3%B3-%EC%84%A4%EC%A0%95%ED%95%98%EB%8A%94%EB%B2%95
 - http kernel에서 guest alias 설정된 미들웨어인 RedirectIfAuthenticated 파일 수정 
+
+
+#### 라우트 필요 메서드만 지정
+- https://anko3899.tistory.com/359
+- except or only
+
+#### 웹 예외사항 예시
+- 페이징 
+    - 잘못된 페이징 요청 (ex. page=-1, page=99999)
+- 로그인 / 비로그인 처리
+- 비로그인 시 edit (url 입력)
+- 로그인 상태에서 회원가입
+
+
+    

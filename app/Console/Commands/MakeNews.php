@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Exceptions\ImageNotFoundException;
 use Illuminate\Console\Command;
 
 class MakeNews extends Command
@@ -132,21 +133,31 @@ class MakeNews extends Command
 
     public function searchFile($filename, $sendDate)
     {
+        $isExist = false;
         $dateDir = substr($sendDate, 0, 4) . "-" . substr($sendDate, 4, 2)
             . "-" . substr($sendDate, 6, 2);
-
         $newsDir = public_path() . "/news/" . $dateDir;
 
         $files = scandir($newsDir);
 
-        foreach ($files as $file) {
-            if ($file == $filename) {
-                copy($newsDir . "/" . $file, public_path() . "/" .
-                    $this->getImgPath($sendDate) . $filename);
-                echo $file . " copied\n";
-                break;
+        try {
+            foreach ($files as $file) {
+                if ($file == $filename) {
+                    copy($newsDir . "/" . $file, public_path() . "/" .
+                        $this->getImgPath($sendDate) . $filename);
+                    echo $file . " copied\n";
+                    $isExist = true;
+                    break;
+                }
+            }
+            if (!$isExist) {
+                throw new ImageNotFoundException("이미지 파일이 없습니다 : (" . $filename . ")\n");
             }
         }
+        catch (ImageNotFoundException $exception){
+            echo $exception->getMessage();
+        }
+
     }
 
     public function insertDB($xml, $taggedBody, $preview_img, $preview_content)

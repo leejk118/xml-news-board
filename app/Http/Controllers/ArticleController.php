@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\ArticleService;
+use App\Exceptions\PageOutOfBoundException;
 use Illuminate\Http\Request;
-use App\Article;
 use App\Http\Requests\ArticleRequest;
+use App\Services\ArticleService;
+use App\Article;
+use App\Exceptions\PagingOverException;
 
 class ArticleController extends Controller
 {
@@ -32,33 +34,14 @@ class ArticleController extends Controller
         $articles = Article::category($request->category, $request->q)
                             ->orderBy('id', 'desc')
                             ->paginate(10);
-        if ($request->page > $articles->lastPage()) {
-            return redirect(route('articles.index'));
+
+        if ($request->page > $articles->lastPage() || $request->page < 0) {
+            throw new PageOutOfBoundException("Out of Page!");
         }
 
         return view('articles.index', compact('articles'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        return "<h1> create Page</h1>";
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        return "<h1>store page</h1>";
-    }
 
     /**
      * Display the specified resource.
