@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class ArticleTest extends TestCase
+class UserControllerTest extends TestCase
 {
     /**
      * A basic feature test example.
@@ -15,10 +15,8 @@ class ArticleTest extends TestCase
      */
     public function testExample()
     {
-        $this->withoutExceptionHandling();
         $response = $this->get('/');
 
-//        $this->assertDatabaseHas('articles');
         $response->assertStatus(302);
     }
 }

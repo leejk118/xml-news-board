@@ -9,7 +9,7 @@
         <form action="{{ route('articles.update', $article->id) }}" method="POST" onsubmit="return submitContents(this);">
             @csrf
             <input type="hidden" name="_method" value="PUT">
-            <input type="hidden" name="queryString" value="{{ $_SERVER['QUERY_STRING'] }}">
+            <input type="hidden" name="queryString" value="{{ isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '' }}">
 
             <h3>제목</h3>
             <div class="form-group">
