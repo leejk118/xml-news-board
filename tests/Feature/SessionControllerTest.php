@@ -2,23 +2,25 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use App\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class SessionControllerTest extends TestCase
 {
-    use WithFaker;
+
+    use DatabaseTransactions;
+
     /**
      * A basic feature test example.
      *
      * @return void
      */
-    public function testSessionCreate()
+    public function testSessionControllerCreate()
     {
-//        $this->withoutExceptionHandling();
+        $user = factory(User::Class)->create();
 
+        // 비로그인
         $response = $this->get('auth/login');
 
         $response->assertStatus(200)
@@ -26,49 +28,21 @@ class SessionControllerTest extends TestCase
                 ->assertSee('이메일')
                 ->assertSee('비밀번호')
                 ->assertsee('로그인하기');
+
+        // 로그인 시 인덱스 페이지
+        $this->actingAs($user)->get('auth/login')
+            ->assertStatus(302)
+            ->assertRedirect('articles');
     }
 
-    public function testSessionStore()
+    public function testSessionControllerStore()
     {
-        $response = $this->post('auth/login');
-
         $this->assertGuest();
-        $response->assertStatus(419);
-
-
-        $user = new User([
-            'name' => $this->faker->name,
-            'email' => $this->faker->email,
-            'password' => bcrypt('secret'),
-        ]);
-
-        $response = $this->post('auth/login', [
-            'email' => $user->email,
-            'password' => 'secret'
-        ]);
-
-        $this->withoutMiddleware();
-
-        $this->actingAs($user)
-            ->get('auth/login')
-            ->assertStatus(200);
-//            ->assertSee('Newss');
-
-//        $this->be($user);
-//        $this->assertAuthenticatedAs($user);
-//        $response->assertStatus(200);
-
-//        $this->assertGuest();
-//        $response->assertRedirect('/articles');
-
-//        $this->actingAs($user);
-
 
     }
 
-    public function testSessionDestroy()
+    public function testSessionControllerDestroy()
     {
-//        $this->assertAuthenticated();
         $response = $this->get('auth/logout');
 
         // 로그아웃 체크
