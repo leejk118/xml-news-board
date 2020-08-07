@@ -7,7 +7,7 @@
 @section('content')
     <div style="width: 70%; margin-left:auto; margin-right : auto">
         <form action="{{ route('articles.update', $article->id) }}" method="POST" onsubmit="return submitContents(this);">
-            @csrf
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="_method" value="PUT">
             <input type="hidden" name="queryString" value="{{ isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '' }}">
 

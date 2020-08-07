@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Article;
 use App\User;
+use App\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Facades\Session;
 use Tests\TestCase;
 
 class ArticleControllerTest extends TestCase
@@ -22,8 +22,9 @@ class ArticleControllerTest extends TestCase
 
     public function testArticleControllerIndex()
     {
-        $this
-            ->get('/articles')
+        $response = $this->get('/articles');
+
+        $response
             ->assertStatus(200)
             ->assertViewIs('articles.index')
             ->assertViewHas('articles')
@@ -35,8 +36,9 @@ class ArticleControllerTest extends TestCase
     {
         $article = factory(Article::class)->create();
 
-        $this
-            ->get('articles/' . $article->id)
+        $response =  $this->get(route('articles.show', $article->id));
+
+        $response
             ->assertStatus(200)
             ->assertViewHas('article')
             ->assertViewIs('articles.show')
@@ -71,55 +73,66 @@ class ArticleControllerTest extends TestCase
             'activated' => 1
         ]);
 
+        $updatedArticle = [
+            'title' => '업데이트된 타이틀',
+            'content' => '업데이트 컨텐트',
+            'subtitle' => '부제목 업데이트',
+            'news_link' => 'http://update.com'
+        ];
+
+        $this->withoutMiddleware(VerifyCsrfToken::class);
 
         // 비 로그인 시
         $this
-            ->actingAs($user)
-            ->put(route('articles.update', $article->id), [$article->id], ['_token' => csrf_token()])
-            ->assertStatus(419);
-//            ->assertSee('dd');
-
-//        $this->call('Put', 'articles/' . $article->id, [$article->id])
-//            ->assertStatus(302)
-//            ->assertRedirect('articles/index');
-//        $this
-//            ->put('articles/' . $article->id, compact('article'), ['_token' => csrf_token()])
-//            ->assertStatus(302)
-//            ->assertSee('dd');
-
-        // 로그인 시
-//        $article->title = 'updated title';
-//        $this
-//            ->actingAs($user)
-//            ->put('articles/' . $article->id, [$article->id], ['_token' => csrf_token()])
-//            ->assertStatus(302)
-//            ->assertSee('dd');
-
-//        $this->assertDatabaseHas('articles', [
-//            'id' => $article->id,
-//            'title' => 'updated title'
-//        ]);
-    }
-
-    public function testArticleControllerDestroy()
-    {
-        Session::start();
-
-        $article = factory(Article::class)->create();
-        $user = factory(User::class)->create([
-            'activated' => 1
-        ]);
-
-        // 비로그인 시
-        $this
-            ->delete(route('articles.destroy', $article->id), ['_token' => csrf_token()])
+            ->put(route('articles.update', $article->id), $updatedArticle)
+            ->assertStatus(302)
             ->assertRedirect('auth/login');
 
         // 로그인 시
         $this
             ->actingAs($user)
-            ->delete(route('articles.destroy', $article->id), ['_token' => csrf_token()])
-            ->assertRedirect('/articles');
+            ->put(route('articles.update', $article->id), $updatedArticle)
+            ->assertStatus(302)
+            ->assertRedirect(route('articles.show', $article->id));
+
+        $this
+            ->get(route('articles.show', $article->id))
+            ->assertStatus(200)
+            ->assertSee($article->id . "번 글이 수정 완료되었습니다.")
+            ->assertSee($updatedArticle['title'])
+            ->assertSee($updatedArticle['content'])
+            ->assertSee($updatedArticle['subtitle'])
+            ->assertSee($updatedArticle['news_link']);
+
+        $this->assertDatabaseHas('articles', [
+            'id' => $article->id,
+            'title' => $updatedArticle['title'],
+            'content' => $updatedArticle['content'],
+            'subtitle' => $updatedArticle['subtitle'],
+            'news_link' => $updatedArticle['news_link']
+        ]);
+    }
+
+    public function testArticleControllerDestroy()
+    {
+        $article = factory(Article::class)->create();
+        $user = factory(User::class)->create([
+            'activated' => 1
+        ]);
+
+        $this
+            ->withoutMiddleware(VerifyCsrfToken::class);
+
+        // 비로그인 시
+        $this
+            ->delete(route('articles.destroy', $article->id))
+            ->assertRedirect('auth/login');
+
+        // 로그인 시
+        $this
+            ->actingAs($user)
+            ->delete(route('articles.destroy', $article->id))
+            ->assertRedirect('articles');
 
         $this
             ->get(route('articles.index'))

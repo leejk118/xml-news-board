@@ -28,11 +28,11 @@
                       onsubmit="return confirm('삭제하시겠습니까?');" class="d-inline">
                     @csrf
                     <input type="hidden" name="_method" value="delete">
-                    <input type="hidden" name="queryString" value="{{ $_SERVER['QUERY_STRING'] }}">
+                    <input type="hidden" name="queryString" value="{{ isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : "" }}">
                     <button class="btn btn-danger">삭제하기</button>
                 </form>
 
-                <a href="{{ route('articles.edit', [$article, $_SERVER['QUERY_STRING']]) }}">
+                <a href="{{ route('articles.edit', [$article, isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : ""]) }}">
                     <button class="btn btn-dark">수정하기</button>
                 </a>
             @endauth

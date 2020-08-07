@@ -11,6 +11,7 @@ $factory->define(Article::class, function (Faker $faker) {
         'content' => $faker->sentence,
         'send_date' => $faker->date,
         'news_link' => 'http://news.example.com',
-        'preview_content' => $faker->sentence
+        'preview_content' => $faker->sentence,
+        'view_count' => 0
     ];
 });

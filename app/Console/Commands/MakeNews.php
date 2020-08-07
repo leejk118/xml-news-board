@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Exceptions\ImageNotFoundException;
+use Doctrine\DBAL\Query\QueryException;
 use Illuminate\Console\Command;
 
 class MakeNews extends Command
@@ -162,14 +163,20 @@ class MakeNews extends Command
 
     public function insertDB($xml, $taggedBody, $preview_img, $preview_content)
     {
-        \App\Article::create([
-            'title' => $xml->NewsContent->Title,
-            'subtitle' => $xml->NewsContent->SubTitle,
-            'content' => $taggedBody,
-            'send_date' => $xml->Header->SendDate,
-            'news_link' => $xml->Metadata->Href,
-            'preview_img' => $preview_img,
-            'preview_content' => $preview_content
-        ]);
+        try {
+            \App\Article::create([
+                'title' => $xml->NewsContent->Title,
+                'subtitle' => $xml->NewsContent->SubTitle,
+                'content' => $taggedBody,
+                'send_date' => $xml->Header->SendDate,
+                'news_link' => $xml->Metadata->Href,
+                'preview_img' => $preview_img,
+                'preview_content' => $preview_content
+            ]);
+        }
+        catch(\Illuminate\Database\QueryException $exception){
+            echo "Article Data가 생성되지 않음\n";
+        }
+
     }
 }
