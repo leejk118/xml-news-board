@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Exceptions\ImageNotFoundException;
-use Doctrine\DBAL\Query\QueryException;
 use Illuminate\Console\Command;
 
 class MakeNews extends Command
