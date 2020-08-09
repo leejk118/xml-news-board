@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Exceptions\ImageNotFoundException;
+use App\Exceptions\XmlParsingException;
 use Illuminate\Console\Command;
+use Illuminate\Database\QueryException;
 
 class MakeNews extends Command
 {
@@ -21,7 +23,21 @@ class MakeNews extends Command
      */
     protected $description = 'Command description';
 
-    public $imgPath;
+    /**
+     * 날짜별 뉴스 디렉토리가 담겨있는 news 디렉토리
+     *
+     * @var string
+     */
+    protected $newsDirectory = 'public/news';
+
+    /**
+     * xml 파싱된 객체
+     *
+     * @var object
+     */
+    protected $articleXML;
+
+    protected $imgPath;
 
     /**
      * Create a new command instance.
@@ -40,68 +56,103 @@ class MakeNews extends Command
      */
     public function handle()
     {
-        $newsDir = public_path() . "/news";
-        $newsDateDirs = scandir($newsDir);
-
+        $newsDateDirs = scandir($this->newsDirectory);
         foreach ($newsDateDirs as $newsDateDir) {
-            $newsPathDir = $newsDir . "/" . $newsDateDir;
+            $newsPathDir = $this->newsDirectory . "/" . $newsDateDir;
             if (!is_dir($newsPathDir) || $newsDateDir == '.' || $newsDateDir == '..') {
                 continue;
             }
 
-            $articlesXml = scandir($newsPathDir);
-            foreach ($articlesXml as $articleXml) {
-                $ext = pathinfo($articleXml);
-                if ($ext['extension'] != 'xml') {
+            $files = scandir($newsPathDir);
+            foreach ($files as $file) {
+                if (!$this->isXmlFile($file) || $file == '.' || $file == '..') {
                     continue;
                 }
 
-                $xml = simplexml_load_file($newsPathDir . "/" . $articleXml);
-                if ($xml === false){
-                    echo "Failed Loading XML\n";
-                    foreach (libxml_get_errors() as $error){
-                        echo $error->message . "\t";
-                    }
-                    continue;
+                try {
+                    $this->setArticleXml($newsPathDir . "/" . $file);
+                    $this->setNewsImgPath($this->articleXML->Header->SendDate);
+                    $this->saveNewsImg($this->articleXML->NewsContent->AppendData, $this->articleXML->Header->SendDate);
+                    $this->insertArticleDB();
+                } catch (XmlParsingException | QueryException | ImageNotFoundException $e){
+                    echo $e->getMessage();
                 }
-
-                $newsContent = $xml->NewsContent;
-                $this->imgPath = $this->getImgPath($xml->Header->SendDate);
-
-                $taggedBody = $this->getTaggedBody($newsContent->TaggedBody);
-                $preview_img = $this->getPreviewImg($newsContent->AppendData->FileName);
-                $preview_content = $this->getPreviewContent($newsContent->Body);
-
-                $this->saveNewsImg($newsContent->AppendData, $xml->Header->SendDate);
-                $this->insertDB($xml, $taggedBody, $preview_img, $preview_content);
-
-                break;
             }
         }
-
         return 0;
     }
 
+    /**
+     * xml 파일이면 true, 아니면 false 리턴
+     *
+     * @param $file
+     * @return bool
+     */
+    public function isXmlFile($file) : bool
+    {
+        return pathinfo($file, PATHINFO_EXTENSION) == 'xml';
+    }
+
+    /**
+     * xml 파일 파싱하여 articleXML 변수에 할당
+     *
+     * @param $xmlFile
+     * @return void
+     * @throws XmlParsingException
+     */
+    public function setArticleXml($xmlFile) : void
+    {
+        $this->articleXML = @simplexml_load_file($xmlFile);
+
+        if(!$this->articleXML) {
+            throw new XmlParsingException("XML Parsing Error!! : $xmlFile\n");
+        }
+    }
+
+    /**
+     * newsImgPath를 news_img/0000/00/00/ 형식으로 설정
+     *
+     * @param $sendDate
+     * @return void
+     */
+    public function setNewsImgPath($sendDate) : void
+    {
+        $year = substr($sendDate, 0, 4);
+        $month = substr($sendDate, 4, 2);
+        $day = substr($sendDate, 6, 2);
+
+        $this->imgPath = "news_img/" . $year . "/" . $month . "/" . $day . "/";
+    }
+
+    /**
+     * 미리보기 이미지의 경로를 지정, 이미지 없을 경우 null
+     *
+     * @param $prevImg
+     * @return string|null
+     */
     public function getPreviewImg($prevImg)
     {
         return (isset($prevImg)) ? $this->imgPath . $prevImg : null;
     }
 
+    /**
+     * 미리보기 내용 설정
+     *
+     * @param $body
+     * @return false|string
+     */
     public function getPreviewContent($body)
     {
         return iconv_substr(str_replace("\n", ' ', $body), 0, 100, "UTF-8");
     }
 
-    public function getImgPath(string $date)
-    {
-        $year = substr($date, 0, 4);
-        $month = substr($date, 4, 2);
-        $day = substr($date, 6, 2);
-
-        return "news_img/" . $year . "/" . $month . "/" . $day . "/";
-    }
-
-    public function getTaggedBody($taggedBody)
+    /**
+     * 정규표현식을 통해 TaggedBody 내용 치환
+     *
+     * @param $taggedBody
+     * @return string|string[]|null
+     */
+    public function getContent($taggedBody)
     {
         $taggedBody = str_replace("\n", '<br/><br/>', $taggedBody);
 
@@ -111,16 +162,22 @@ class MakeNews extends Command
             preg_match("/title='(.*?)'/", $matches[1], $title);
             preg_match("/caption='(.*?)'/", $matches[1], $caption);
 
-            $result = "<img src='/" . $this->imgPath . $path[1] . "' />";
-            $result .= (isset($title[1])) ? "<br><strong>" . $title[1] . "</strong>" : "";
-            $result .= (isset($caption[1])) ? "<p>" .$caption[1] . "</p>" : "";
+            $ret = "<img src='/" . $this->imgPath . $path[1] . "' />";
+            $ret .= (isset($title[1])) ? "<br><strong>" . $title[1] . "</strong>" : "";
+            $ret .= (isset($caption[1])) ? "<p>" .$caption[1] . "</p>" : "";
 
-            return $result;
+            return $ret;
         }, $taggedBody);
 
         return $result;
     }
 
+    /**
+     * 이미지 파일 저장
+     *
+     * @param $imgs
+     * @param $sendDate
+     */
     public function saveNewsImg($imgs, $sendDate)
     {
         foreach ($imgs as $img) {
@@ -131,51 +188,57 @@ class MakeNews extends Command
         }
     }
 
+    /**
+     * 기존 폴더에서 검색하여 이미지 파일 저장
+     *
+     * @param $filename
+     * @param $sendDate
+     * @throws ImageNotFoundException
+     */
     public function searchFile($filename, $sendDate)
     {
         $isExist = false;
         $dateDir = substr($sendDate, 0, 4) . "-" . substr($sendDate, 4, 2)
             . "-" . substr($sendDate, 6, 2);
-        $newsDir = public_path() . "/news/" . $dateDir;
+        $newsDir = $this->newsDirectory . '/' . $dateDir;
 
         $files = scandir($newsDir);
 
-        try {
-            foreach ($files as $file) {
-                if ($file == $filename) {
-                    copy($newsDir . "/" . $file, public_path() . "/" .
-                        $this->getImgPath($sendDate) . $filename);
-                    echo $file . " copied\n";
-                    $isExist = true;
-                    break;
-                }
-            }
-            if (!$isExist) {
-                throw new ImageNotFoundException("이미지 파일이 없습니다 : (" . $filename . ")\n");
+        foreach ($files as $file) {
+            if ($file == $filename) {
+                copy($newsDir . "/" . $file, public_path() . "/" .
+                    $this->imgPath . $filename);
+                echo $file . " copied\n";
+                $isExist = true;
+                break;
             }
         }
-        catch (ImageNotFoundException $exception){
-            echo $exception->getMessage();
+        if (!$isExist) {
+            throw new ImageNotFoundException("이미지 파일이 없습니다 : (" . $filename . ")\n");
         }
-
     }
 
-    public function insertDB($xml, $taggedBody, $preview_img, $preview_content)
+    /**
+     * DB에 적재
+     *
+     * @return void
+     * @throws QueryException
+     */
+    public function insertArticleDB()
     {
         try {
             \App\Article::create([
-                'title' => $xml->NewsContent->Title,
-                'subtitle' => $xml->NewsContent->SubTitle,
-                'content' => $taggedBody,
-                'send_date' => $xml->Header->SendDate,
-                'news_link' => $xml->Metadata->Href,
-                'preview_img' => $preview_img,
-                'preview_content' => $preview_content
+                'title' => $this->articleXML->NewsContent->Title,
+                'subtitle' => $this->articleXML->NewsContent->SubTitle,
+                'content' => $this->getContent($this->articleXML->NewsContent->TaggedBody),
+                'send_date' => $this->articleXML->Header->SendDate,
+                'news_link' => $this->articleXML->Metadata->Href,
+                'preview_img' => $this->getPreviewImg($this->articleXML->NewsContent->AppendData->FileName),
+                'preview_content' => $this->getPreviewContent($this->articleXML->NewsContent->Body)
             ]);
         }
         catch(\Illuminate\Database\QueryException $exception){
-            echo "Article Data가 생성되지 않음\n";
+            echo "Insert Database Error!!\n";
         }
-
     }
 }

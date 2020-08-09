@@ -26,8 +26,8 @@ class ArticleRequest extends FormRequest
         return [
             'title' => 'required | max:100',
             'subtitle' => 'max:150',
-            'news_link' => 'required | max:100',
-            'content' => 'required | max:7000',
+            'news_link' => 'required | max:50',
+            'content' => 'required | max:8000',
         ];
     }
 

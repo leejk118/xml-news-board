@@ -38,7 +38,7 @@ class UserTest extends TestCase
         ])->assertSessionHasErrors('password');
     }
 
-    public function test()
+    public function testLogInRedirectWhenLoggedIn()
     {
 
     }
