@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-
 use App\Article;
 
 class ArticleRepository
@@ -14,20 +13,43 @@ class ArticleRepository
         $this->article = $article;
     }
 
+    public function all()
+    {
+        return $this->article
+                    ->orderBy('id', 'desc')
+                    ->paginate(10);
+    }
+
     public function index($category, $q)
     {
         switch ($category) {
             case 'both':
-                $this->article->orWhere('title', 'like', '%'. $q . '%');
-                $this->article->orWhere('content', 'like', '%'. $q . '%');
-                break;
+                return $this->article
+                                ->where('title', 'like', '%'. $q . '%')
+                                ->orWhere('content', 'like', '%'. $q . '%')
+                                ->paginate(10);
             case 'title':
             case 'content':
-                $this->article->where($category, 'like', '%'. $q . '%');
-                break;
+                return $this->article
+                                ->where($category, 'like', '%'. $q . '%')
+                                ->paginate(10);
             default:
-                break;
+                return $this->article;
         }
-        return $this->article->orderBy('id', 'desc')->paginate(15);
+    }
+
+    public function show(int $id)
+    {
+        return $this->article->find($id);
+    }
+
+    public function update($id, $input)
+    {
+        $this->article->find($id)->update($input);
+    }
+
+    public function delete($id)
+    {
+        $this->article->find($id)->delete();
     }
 }

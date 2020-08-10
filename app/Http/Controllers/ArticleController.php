@@ -21,16 +21,12 @@ class ArticleController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return \Illuminate\View\View
      * @throws PageOutOfBoundException
      */
     public function index(Request $request)
     {
         $articles = $this->articleService->index($request->category, $request->q);
-
-//        $articles = Article::category($request->category, $request->q)
-//                            ->orderBy('id', 'desc')
-//                            ->paginate(10);
 
         if ($request->page > $articles->lastPage() || $request->page < 0) {
             throw new PageOutOfBoundException("Out of Page!");
@@ -41,48 +37,33 @@ class ArticleController extends Controller
 
 
     /**
-     * @param Article $article
-     * @return \Illuminate\Contracts\Foundation\Application|View
+     * @param int $id
+     * @return \Illuminate\View\View
      */
-    public function show(Article $article)
+    public function show(Article $articles)
     {
-        $queryString = request()->getQueryString();
-        $article->view_count += 1;
-        $article->save();
+        $article = $this->articleService->show($articles->id);
 
-        return view('articles.show', compact('article', 'queryString'));
+        return view('articles.show', ['article' => $article, 'queryString' => request()->getQueryString()]);
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Article $article
+     * @return \Illuminate\View\View
      */
     public function edit(Article $article)
     {
-        $queryString = request()->getQueryString();
-
-        return view('articles.edit', compact('article', 'queryString'));
+        return view('articles.edit', ['article' => $article, 'queryString' => request()->getQueryString()]);
     }
 
     /**
-     * Update the specified resource in storage.
-     *
      * @param ArticleRequest $request
      * @param Article $article
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function update(ArticleRequest $request, Article $article)
     {
-        $previewContent = iconv_substr(preg_replace(
-            "/<(.+?)>/",
-            "",
-            $request->all()['content']
-        ), 0, 100, "UTF-8");
-        $request->merge(['preview_content' => $previewContent]);
-
-        $article->update($request->all());
+        $this->articleService->update($request->only('title', 'subtitle', 'news_link', 'content'), $article->id);
 
         flash($article->id . '번 글이 수정 완료되었습니다.');
 
@@ -90,16 +71,14 @@ class ArticleController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
      * @param Request $request
      * @param Article $article
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      * @throws \Exception
      */
     public function destroy(Request $request, Article $article)
     {
-        $article->delete();
+        $this->articleService->delete($article->id);
 
         flash($article->id . '번 글이 삭제 완료되었습니다.');
 
@@ -113,10 +92,8 @@ class ArticleController extends Controller
      */
     public function destroys(Request $request)
     {
-        $list = json_decode($request->getContent(), true);
+        $this->articleService->deleteAll($request->getContent());
 
-        foreach ($list['data'] as $id) {
-            Article::destroy($id);
-        }
+        flash('삭제 완료되었습니다.');
     }
 }
