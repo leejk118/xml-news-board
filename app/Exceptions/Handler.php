@@ -56,13 +56,11 @@ class Handler extends ExceptionHandler
                 'title' => '페이지를 찾을 수 없습니다.',
                 'description' => '죄송합니다! 요청하신 페이지가 없습니다.'
             ]), 404);
-        }
-        elseif ($exception instanceof PageOutOfBoundException) {
+        } elseif ($exception instanceof PageOutOfBoundException) {
             flash()->error('페이징이 올바르지 않습니다. 인덱스 페이지로 이동합니다.');
             return redirect(route('articles.index'));
         }
 
         return parent::render($request, $exception);
     }
-
 }

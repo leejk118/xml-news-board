@@ -10,7 +10,6 @@ use Tests\TestCase;
 
 class ArticleControllerTest extends TestCase
 {
-
     use DatabaseTransactions;
 
     public function testRootRedirectToArticleIndex()
@@ -142,5 +141,4 @@ class ArticleControllerTest extends TestCase
         $this
             ->assertDatabaseMissing('articles', ['id' => $article->id]);
     }
-
 }

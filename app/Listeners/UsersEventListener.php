@@ -5,7 +5,8 @@ namespace App\Listeners;
 use App\Events\UserCreated;
 use App\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Events\Dispatcher;use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
 
 class UsersEventListener

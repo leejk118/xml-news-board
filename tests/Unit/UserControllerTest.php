@@ -12,7 +12,6 @@ use Tests\TestCase;
 
 class UserControllerTest extends TestCase
 {
-
     use DatabaseTransactions, WithFaker, WithoutEvents;
 
     public function testUserControllerCreate()

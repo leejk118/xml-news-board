@@ -9,7 +9,6 @@ use Tests\TestCase;
 
 class SessionControllerTest extends TestCase
 {
-
     use DatabaseTransactions;
 
     protected $user;
@@ -18,7 +17,7 @@ class SessionControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::Class)->create([
+        $this->user = factory(User::class)->create([
             'activated' => 1
         ]);
     }
@@ -84,5 +83,4 @@ class SessionControllerTest extends TestCase
             ->assertSee('register')
             ->assertDontSee('logout');
     }
-
 }

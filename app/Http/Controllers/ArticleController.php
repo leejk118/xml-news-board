@@ -9,7 +9,6 @@ use App\Article;
 
 class ArticleController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['index', 'show']]);
@@ -69,8 +68,11 @@ class ArticleController extends Controller
      */
     public function update(ArticleRequest $request, Article $article)
     {
-        $previewContent = iconv_substr(preg_replace("/<(.+?)>/", "",
-                                            $request->all()['content']), 0, 100, "UTF-8");
+        $previewContent = iconv_substr(preg_replace(
+            "/<(.+?)>/",
+            "",
+            $request->all()['content']
+        ), 0, 100, "UTF-8");
         $request->merge(['preview_content' => $previewContent]);
 
         $article->update($request->all());

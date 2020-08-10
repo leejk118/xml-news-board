@@ -71,7 +71,7 @@ class MakeNews extends Command
                         $this->setNewsImgPath($this->articleXML->Header->SendDate);
                         $this->saveNewsImg($this->articleXML->NewsContent->AppendData, $this->articleXML->Header->SendDate);
                         $this->insertArticleDB();
-                    } catch (XmlParsingException | QueryException | ImageNotFoundException $e){
+                    } catch (XmlParsingException | QueryException | ImageNotFoundException $e) {
                         echo $e->getMessage();
                     }
                 }
@@ -182,8 +182,10 @@ class MakeNews extends Command
             if (!file_exists("public/" . $this->imgPath)) {
                 mkdir("public/" . $this->imgPath, 0777, true);
             }
-            throw_unless($this->searchFile($img->FileName, $sendDate),
-                new ImageNotFoundException("이미지 파일이 없습니다!\n"));
+            throw_unless(
+                $this->searchFile($img->FileName, $sendDate),
+                new ImageNotFoundException("이미지 파일이 없습니다!\n")
+            );
         }
     }
 
@@ -234,8 +236,7 @@ class MakeNews extends Command
                 'preview_img' => $this->getPreviewImg($this->articleXML->NewsContent->AppendData->FileName),
                 'preview_content' => $this->getPreviewContent($this->articleXML->NewsContent->Body)
             ]);
-        }
-        catch(\Illuminate\Database\QueryException $exception){
+        } catch (\Illuminate\Database\QueryException $exception) {
             echo "Insert Database Error!!\n";
         }
     }

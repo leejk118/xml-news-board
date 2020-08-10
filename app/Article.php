@@ -11,7 +11,7 @@ class Article extends Model
 
     public function scopeCategory($query, $category, $q)
     {
-        switch ($category){
+        switch ($category) {
             case 'both':
                 $query->orWhere('title', 'like', '%'. $q . '%');
                 $query->orWhere('content', 'like', '%'. $q . '%');
