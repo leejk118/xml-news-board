@@ -2,11 +2,19 @@
 
 namespace App\Providers;
 
+use App\NewsHistory;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * 테스트용 날짜 데이터
+     * @var string
+     */
+    protected $tempDate = '2020-07-17';
+
     /**
      * Register any application services.
      *
@@ -24,13 +32,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-//        view()->composer("*", function($view){
-//            $newsHistories = Cache::remember('newsHistories', "" , function(){
-//                return \App\NewsHistory::where('send_date', '=', '2020-07-16')->
-//                                with('article')->orderBy('id', 'desc')->limit(5)->get();
-//            });
-//
-//            $view->with(compact('newsHistories'));
-//        });
+        View::composer('articles.index', function($view){
+            $newsHistories = Cache::remember('newsHistories', "" , function(){
+                return NewsHistory::where('send_date', '=', $this->tempDate)
+                                ->with('article')
+                                ->orderBy('view_count', 'desc')
+                                ->get();
+            });
+
+            $view->with(compact('newsHistories'));
+        });
     }
 }
