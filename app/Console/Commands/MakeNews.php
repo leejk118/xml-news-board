@@ -65,17 +65,15 @@ class MakeNews extends Command
 
             $files = scandir($newsPathDir);
             foreach ($files as $file) {
-                if (!$this->isXmlFile($file) || $file == '.' || $file == '..') {
-                    continue;
-                }
-
-                try {
-                    $this->setArticleXml($newsPathDir . "/" . $file);
-                    $this->setNewsImgPath($this->articleXML->Header->SendDate);
-                    $this->saveNewsImg($this->articleXML->NewsContent->AppendData, $this->articleXML->Header->SendDate);
-                    $this->insertArticleDB();
-                } catch (XmlParsingException | QueryException | ImageNotFoundException $e){
-                    echo $e->getMessage();
+                if ($this->isXmlFile($file) && $file != '.' && $file != '..') {
+                    try {
+                        $this->setArticleXml($newsPathDir . "/" . $file);
+                        $this->setNewsImgPath($this->articleXML->Header->SendDate);
+                        $this->saveNewsImg($this->articleXML->NewsContent->AppendData, $this->articleXML->Header->SendDate);
+                        $this->insertArticleDB();
+                    } catch (XmlParsingException | QueryException | ImageNotFoundException $e){
+                        echo $e->getMessage();
+                    }
                 }
             }
         }
@@ -94,19 +92,16 @@ class MakeNews extends Command
     }
 
     /**
-     * xml 파일 파싱하여 articleXML 변수에 할당
+     * XML파일 파싱하여 articleXML변수에 할당
      *
      * @param $xmlFile
-     * @return void
      * @throws XmlParsingException
      */
     public function setArticleXml($xmlFile) : void
     {
         $this->articleXML = @simplexml_load_file($xmlFile);
 
-        if(!$this->articleXML) {
-            throw new XmlParsingException("XML Parsing Error!! : $xmlFile\n");
-        }
+        throw_unless($this->articleXML, new XmlParsingException("XML Parsing Error!! : $xmlFile\n"));
     }
 
     /**
@@ -132,22 +127,24 @@ class MakeNews extends Command
      */
     public function getPreviewImg($prevImg)
     {
-        return (isset($prevImg)) ? $this->imgPath . $prevImg : null;
+        return (isset($prevImg)) ? ($this->imgPath . $prevImg) : null;
     }
 
     /**
-     * 미리보기 내용 설정
+     * 미리보기 본문 내용 리턴
      *
      * @param $body
-     * @return false|string
+     * @return string
+     *
+     * TODO : iconv_substr false 리턴 시 exception 처리
      */
-    public function getPreviewContent($body)
+    public function getPreviewContent($body) : string
     {
         return iconv_substr(str_replace("\n", ' ', $body), 0, 100, "UTF-8");
     }
 
     /**
-     * 정규표현식을 통해 TaggedBody 내용 치환
+     * 정규표현식을 통해 TaggedBody 내용 변환
      *
      * @param $taggedBody
      * @return string|string[]|null
@@ -177,6 +174,7 @@ class MakeNews extends Command
      *
      * @param $imgs
      * @param $sendDate
+     * @throws ImageNotFoundException
      */
     public function saveNewsImg($imgs, $sendDate)
     {
@@ -184,7 +182,8 @@ class MakeNews extends Command
             if (!file_exists("public/" . $this->imgPath)) {
                 mkdir("public/" . $this->imgPath, 0777, true);
             }
-            $this->searchFile($img->FileName, $sendDate);
+            throw_unless($this->searchFile($img->FileName, $sendDate),
+                new ImageNotFoundException("이미지 파일이 없습니다!\n"));
         }
     }
 
@@ -193,9 +192,9 @@ class MakeNews extends Command
      *
      * @param $filename
      * @param $sendDate
-     * @throws ImageNotFoundException
+     * @return bool
      */
-    public function searchFile($filename, $sendDate)
+    public function searchFile($filename, $sendDate) : bool
     {
         $isExist = false;
         $dateDir = substr($sendDate, 0, 4) . "-" . substr($sendDate, 4, 2)
@@ -213,9 +212,8 @@ class MakeNews extends Command
                 break;
             }
         }
-        if (!$isExist) {
-            throw new ImageNotFoundException("이미지 파일이 없습니다 : (" . $filename . ")\n");
-        }
+
+        return $isExist;
     }
 
     /**

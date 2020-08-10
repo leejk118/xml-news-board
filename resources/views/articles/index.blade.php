@@ -98,7 +98,7 @@
                     <option value="title">제목</option>
                     <option value="content">본문</option>
                 </select>
-                <input type="text" name="q" class="form-control searchForm" placeholder="기사 검색" />
+                <input type="text" name="q" class="form-control searchForm" placeholder="검색어 입력" />
                 <button type="submit" class="btn btn-primary">검색</button>
             </form>
         </div>

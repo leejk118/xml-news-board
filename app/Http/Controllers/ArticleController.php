@@ -5,32 +5,23 @@ namespace App\Http\Controllers;
 use App\Exceptions\PageOutOfBoundException;
 use Illuminate\Http\Request;
 use App\Http\Requests\ArticleRequest;
-use App\Services\ArticleService;
 use App\Article;
-use App\Exceptions\PagingOverException;
 
 class ArticleController extends Controller
 {
 
-//    protected $articleService;
-
-    public function __construct(ArticleService $articleService)
+    public function __construct()
     {
-//        $this->articleService = $articleService;
-
         $this->middleware('auth', ['except' => ['index', 'show']]);
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws PageOutOfBoundException
      */
     public function index(Request $request)
     {
-//        $articles = $this->articleService->getArticles($request->category, $request->q);
-
-
         $articles = Article::category($request->category, $request->q)
                             ->orderBy('id', 'desc')
                             ->paginate(10);
@@ -44,10 +35,8 @@ class ArticleController extends Controller
 
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Article $article
+     * @return \Illuminate\Contracts\Foundation\Application|View
      */
     public function show(Article $article)
     {
@@ -74,8 +63,8 @@ class ArticleController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param ArticleRequest $request
+     * @param Article $article
      * @return \Illuminate\Http\Response
      */
     public function update(ArticleRequest $request, Article $article)
@@ -94,8 +83,10 @@ class ArticleController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Request $request
+     * @param Article $article
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function destroy(Request $request, Article $article)
     {
@@ -106,6 +97,11 @@ class ArticleController extends Controller
         return redirect(route('articles.index', $request->queryString));
     }
 
+    /**
+     * 일괄 삭제 기능
+     *
+     * @param Request $request
+     */
     public function destroys(Request $request)
     {
         $list = json_decode($request->getContent(), true);
