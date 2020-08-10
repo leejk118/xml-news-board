@@ -32,8 +32,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        View::composer('articles.index', function($view){
-            $newsHistories = Cache::remember('newsHistories', "" , function(){
+        View::composer('articles.index', function ($view) {
+            $newsHistories = Cache::remember('newsHistories', "", function () {
                 return NewsHistory::where('send_date', '=', $this->tempDate)
                                 ->with('article')
                                 ->orderBy('view_count', 'desc')

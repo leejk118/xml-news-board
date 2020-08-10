@@ -49,7 +49,7 @@ class MakeNewsHistory extends Command
                                 ->limit(5)
                                 ->get();
 
-        foreach($articles as $article){
+        foreach ($articles as $article) {
             \App\NewsHistory::create(['send_date' => $article->send_date,
                                     'article_id' => $article->id,
                                     'view_count' => $article->view_count]);

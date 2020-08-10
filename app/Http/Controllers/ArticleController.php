@@ -3,14 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\PageOutOfBoundException;
+use App\Services\ArticleService;
 use Illuminate\Http\Request;
 use App\Http\Requests\ArticleRequest;
 use App\Article;
 
 class ArticleController extends Controller
 {
-    public function __construct()
+    protected $articleService;
+
+    public function __construct(ArticleService $articleService)
     {
+        $this->articleService = $articleService;
+
         $this->middleware('auth', ['except' => ['index', 'show']]);
     }
 
@@ -21,9 +26,11 @@ class ArticleController extends Controller
      */
     public function index(Request $request)
     {
-        $articles = Article::category($request->category, $request->q)
-                            ->orderBy('id', 'desc')
-                            ->paginate(10);
+        $articles = $this->articleService->index($request->category, $request->q);
+
+//        $articles = Article::category($request->category, $request->q)
+//                            ->orderBy('id', 'desc')
+//                            ->paginate(10);
 
         if ($request->page > $articles->lastPage() || $request->page < 0) {
             throw new PageOutOfBoundException("Out of Page!");

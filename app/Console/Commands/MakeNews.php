@@ -241,7 +241,7 @@ class MakeNews extends Command
             ]);
         } catch (QueryException $e) {
             echo "Insert Database Error!!\n";
-        } catch (XmlParsingException $e){
+        } catch (XmlParsingException $e) {
             echo $e->getMessage();
         }
     }
