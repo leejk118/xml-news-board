@@ -135,12 +135,16 @@ class MakeNews extends Command
      *
      * @param $body
      * @return string
+     * @throws XmlParsingException
      *
-     * TODO : iconv_substr false 리턴 시 exception 처리
      */
     public function getPreviewContent($body) : string
     {
-        return iconv_substr(str_replace("\n", ' ', $body), 0, 100, "UTF-8");
+        $ret = iconv_substr(str_replace("\n", ' ', $body), 0, 100, "UTF-8");
+
+        throw_unless($ret, new XmlParsingException('미리보기 내용 substr Error'));
+
+        return $ret;
     }
 
     /**
@@ -154,7 +158,8 @@ class MakeNews extends Command
         $taggedBody = str_replace("\n", '<br/><br/>', $taggedBody);
 
         $pattern = '/<YNAPHOTO(.+?)\/>/';
-        $result = preg_replace_callback($pattern, function ($matches) {
+
+        return preg_replace_callback($pattern, function ($matches) {
             preg_match("/path='(.*?)'/", $matches[1], $path);
             preg_match("/title='(.*?)'/", $matches[1], $title);
             preg_match("/caption='(.*?)'/", $matches[1], $caption);
@@ -165,8 +170,6 @@ class MakeNews extends Command
 
             return $ret;
         }, $taggedBody);
-
-        return $result;
     }
 
     /**
@@ -183,7 +186,7 @@ class MakeNews extends Command
                 mkdir("public/" . $this->imgPath, 0777, true);
             }
             throw_unless(
-                $this->searchFile($img->FileName, $sendDate),
+                $this->searchImgFile($img->FileName, $sendDate),
                 new ImageNotFoundException("이미지 파일이 없습니다!\n")
             );
         }
@@ -196,7 +199,7 @@ class MakeNews extends Command
      * @param $sendDate
      * @return bool
      */
-    public function searchFile($filename, $sendDate) : bool
+    public function searchImgFile($filename, $sendDate) : bool
     {
         $isExist = false;
         $dateDir = substr($sendDate, 0, 4) . "-" . substr($sendDate, 4, 2)
@@ -224,7 +227,7 @@ class MakeNews extends Command
      * @return void
      * @throws QueryException
      */
-    public function insertArticleDB()
+    public function insertArticleDB() : void
     {
         try {
             \App\Article::create([
@@ -236,8 +239,10 @@ class MakeNews extends Command
                 'preview_img' => $this->getPreviewImg($this->articleXML->NewsContent->AppendData->FileName),
                 'preview_content' => $this->getPreviewContent($this->articleXML->NewsContent->Body)
             ]);
-        } catch (\Illuminate\Database\QueryException $exception) {
+        } catch (QueryException $e) {
             echo "Insert Database Error!!\n";
+        } catch (XmlParsingException $e){
+            echo $e->getMessage();
         }
     }
 }
