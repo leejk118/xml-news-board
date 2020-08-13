@@ -48,8 +48,7 @@ class UserService
 
         if (!$user) {
             flash('URL이 정확하지 않습니다.');
-        }
-        else {
+        } else {
             $data = [
                 'activated' => 1,
                 'confirm_code' => null
@@ -61,5 +60,4 @@ class UserService
             flash(Auth::user()->name . '님. 환영합니다. 가입 확인되었습니다.');
         }
     }
-
 }

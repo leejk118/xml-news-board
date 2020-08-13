@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\PageOutOfBoundException;
 use App\Services\ArticleService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\ArticleRequest;
 use App\Article;
+use Illuminate\Routing\Redirector;
+use Illuminate\View\View;
 
 class ArticleController extends Controller
 {
@@ -28,7 +31,7 @@ class ArticleController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\View\View
+     * @return View
      * @throws PageOutOfBoundException
      */
     public function index(Request $request)
@@ -45,7 +48,7 @@ class ArticleController extends Controller
 
     /**
      * @param int $id
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function show(Article $articles)
     {
@@ -56,7 +59,7 @@ class ArticleController extends Controller
 
     /**
      * @param Article $article
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function edit(Article $article)
     {
@@ -66,7 +69,7 @@ class ArticleController extends Controller
     /**
      * @param ArticleRequest $request
      * @param Article $article
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return RedirectResponse|Redirector
      */
     public function update(ArticleRequest $request, Article $article)
     {
@@ -78,7 +81,7 @@ class ArticleController extends Controller
     /**
      * @param Request $request
      * @param Article $article
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return RedirectResponse|Redirector
      * @throws \Exception
      */
     public function destroy(Request $request, Article $article)
