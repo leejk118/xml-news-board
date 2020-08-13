@@ -905,3 +905,5 @@
     
 > 테스트 시 500 에러 -> laravel.log 보고 해결 (queryString 문제 있었음)    
     
+#### Repositor Pattern
+참고 https://medium.com/employbl/use-the-repository-design-pattern-in-a-laravel-application-13f0b46a3dce

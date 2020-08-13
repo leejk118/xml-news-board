@@ -3,16 +3,29 @@
 namespace App\Repositories;
 
 use App\Article;
+use Illuminate\Pagination\LengthAwarePaginator;
 
-class ArticleRepository
+class ArticleRepository implements RepositoryInterface
 {
+    /**
+     *
+     * @var Article
+     */
     protected $article;
 
+    /**
+     * ArticleRepository constructor.
+     *
+     * @param Article $article
+     */
     public function __construct(Article $article)
     {
         $this->article = $article;
     }
 
+    /**
+     * @return LengthAwarePaginator
+     */
     public function all()
     {
         return $this->article
@@ -20,6 +33,11 @@ class ArticleRepository
                     ->paginate(10);
     }
 
+    /**
+     * @param $category
+     * @param $q
+     * @return Article
+     */
     public function index($category, $q)
     {
         switch ($category) {
@@ -38,18 +56,40 @@ class ArticleRepository
         }
     }
 
-    public function show(int $id)
+    public function create($data)
     {
-        return $this->article->find($id);
+        //
     }
 
-    public function update($id, $input)
+    /**
+     *
+     *
+     * @param array $data
+     * @param $id
+     */
+    public function update($data, $id)
     {
-        $this->article->find($id)->update($input);
+        return $this->article->find($id)->update($data);
     }
 
+    /**
+     *
+     *
+     * @param $id
+     */
     public function delete($id)
     {
-        $this->article->find($id)->delete();
+        return $this->article->find($id)->delete();
+    }
+
+    /**
+     *
+     *
+     * @param $id
+     * @return mixed
+     */
+    public function show($id)
+    {
+        return $this->article->find($id);
     }
 }

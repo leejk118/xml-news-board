@@ -11,7 +11,6 @@ class Article extends Model
 
     public function newsHistories()
     {
-        return $this->hasOne(NewsHistory::class);
+        return $this->hasMany(NewsHistory::class);
     }
-
 }

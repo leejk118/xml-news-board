@@ -10,8 +10,15 @@ use App\Article;
 
 class ArticleController extends Controller
 {
+    /**
+     * @var ArticleService
+     */
     protected $articleService;
 
+    /**
+     * ArticleController constructor.
+     * @param ArticleService $articleService
+     */
     public function __construct(ArticleService $articleService)
     {
         $this->articleService = $articleService;
@@ -65,8 +72,6 @@ class ArticleController extends Controller
     {
         $this->articleService->update($request->only('title', 'subtitle', 'news_link', 'content'), $article->id);
 
-        flash($article->id . '번 글이 수정 완료되었습니다.');
-
         return redirect(route('articles.show', [$article->id, $request->queryString]));
     }
 
@@ -80,8 +85,6 @@ class ArticleController extends Controller
     {
         $this->articleService->delete($article->id);
 
-        flash($article->id . '번 글이 삭제 완료되었습니다.');
-
         return redirect(route('articles.index', $request->queryString));
     }
 
@@ -93,7 +96,5 @@ class ArticleController extends Controller
     public function destroys(Request $request)
     {
         $this->articleService->deleteAll($request->getContent());
-
-        flash('삭제 완료되었습니다.');
     }
 }

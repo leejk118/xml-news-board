@@ -28,7 +28,7 @@
                 <hr>
                 <div class="text-center">
                     @foreach($newsHistories as $newsHistory)
-                        <a href="{{ route('articles.show', [$newsHistory->article->id, $_SERVER['QUERY_STRING']]) }}" class="text-dark">
+                        <a href="{{ route('articles.show', [$newsHistory->article->id, isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : ""]) }}" class="text-dark">
                             <div class="card d-inline-block" style="width: 19%;">
                                 @if (isset($newsHistory->article->preview_img))
                                     <img class="card-img-top" src="{{ $newsHistory->article->preview_img }}"  height="120px" >
